@@ -1,0 +1,52 @@
+﻿-- Usuario
+INSERT INTO "Usuarios" ("Nombre", "Apellido", "Email", "PasswordHash", "Rol", "FechaRegistro", "Estado", "FechaCreacion", "EstaBorrado")
+VALUES ('Admin', 'Principal', 'admin@taller.com', 'hashed_password', 0, CURRENT_DATE, true, CURRENT_TIMESTAMP, false);
+
+-- Cliente (Relacionado con Usuario)
+INSERT INTO "Clientes" ("UsuarioId", "Direccion", "Telefono", "FechaNacimiento", "FechaCreacion", "EstaBorrado")
+VALUES (1, '123 Calle Taller', '555-1234', '1980-05-15', CURRENT_TIMESTAMP, false);
+
+-- Producto
+INSERT INTO "Productos" ("Nombre", "Descripcion", "Precio", "Stock", "Categoria", "FechaCreacion", "EstaBorrado")
+VALUES ('Aceite de Motor', 'Aceite 5W30 para motor', 25.99, 50, 2, CURRENT_TIMESTAMP, false);
+
+-- Servicio
+INSERT INTO "Servicios" ("Nombre", "Descripcion", "Precio", "FechaCreacion", "EstaBorrado")
+VALUES ('Cambio de Aceite', 'Cambio de aceite y revisión básica', 50.00, CURRENT_TIMESTAMP, false);
+
+-- Vehículo (Relacionado con Cliente)
+INSERT INTO "Vehiculos" ("ClienteId", "Marca", "Modelo", "Año", "Placa", "FechaCreacion", "EstaBorrado")
+VALUES (1, 'Toyota', 'Corolla', 2015, 'ABC123', CURRENT_TIMESTAMP, false);
+
+-- Factura
+INSERT INTO "Facturas" ("CodigoFactura", "ClienteId", "Total", "FechaCreacion", "FechaVencimiento", "Estado", "FechaActualizacion", "EstaBorrado")
+VALUES ('FAC-001', 1, 75.99, CURRENT_TIMESTAMP, CURRENT_DATE + INTERVAL '30 days', 1, CURRENT_TIMESTAMP, false);
+
+
+-- Carta de Pago
+INSERT INTO "CartasPago" ("FacturaId", "ClienteId", "Monto", "FechaPago", "MetodoPago", "FechaCreacion", "EstaBorrado")
+VALUES (1, 1, 75.99, CURRENT_TIMESTAMP, 0, CURRENT_TIMESTAMP, false);
+
+-- Pago (Relacionado con Cliente y Producto)
+INSERT INTO "Pagos" ("ClienteId", "Monto", "FechaTransaccion", "TipoPago", "ProductoId", "FechaCreacion", "EstaBorrado")
+VALUES (1, 25.99, CURRENT_TIMESTAMP, 0, 1, CURRENT_TIMESTAMP, false);
+
+-- Notificación (Relacionado con Cliente)
+INSERT INTO "Notificaciones" ("ClienteId", "Mensaje", "FechaEnvio", "Tipo", "Leido", "FechaCreacion", "EstaBorrado")
+VALUES (1, 'Nueva factura disponible', CURRENT_TIMESTAMP, 0, false, CURRENT_TIMESTAMP, false);
+
+-- Carrito (Relacionado con Cliente y Producto)
+INSERT INTO "Carritos" ("ClienteId", "ProductoId", "Cantidad", "PrecioTotal", "FechaCreacion", "EstaBorrado")
+VALUES (1, 1, 2, 51.98, CURRENT_TIMESTAMP, false);
+
+-- Parte (Relacionado con Cliente)
+INSERT INTO "Partes" ("ClienteId", "Descripcion", "Costo", "imagen", "FechaCreacion", "EstaBorrado")
+VALUES (1, 'Parabrisas delantero', 120.00, 'parabrisas.png', CURRENT_TIMESTAMP, false);
+
+-- Relación muchos a muchos entre Cliente y Servicio (ClienteServicio)
+INSERT INTO "ClienteServicio" ("ClienteId", "ServicioId")
+VALUES (1, 1);
+
+-- Relación muchos a muchos entre Vehículo y Servicio (VehiculoServicio)
+INSERT INTO "VehiculoServicio" ("VehiculoId", "ServicioId")
+VALUES (1, 1);
