@@ -1,0 +1,49 @@
+<div class="registro-container">
+  <p-card header="Regístrate" styleClass="registro-card">
+    <form (ngSubmit)="registrar()" class="p-fluid">
+      <div class="p-field">
+        <label for="nombre" style="color: white">Nombre</label>
+        <input pInputText id="nombre" [(ngModel)]="nombre" name="nombre" required placeholder="Introduce tu nombre" />
+      </div>
+
+      <div class="p-field">
+        <label for="apellido" style="color: white">Apellido</label>
+        <input pInputText id="apellido" [(ngModel)]="apellido" name="apellido" required placeholder="Introduce tu apellido" />
+      </div>
+
+      <div class="p-field">
+        <label for="email" style="color: white">Email</label>
+        <input pInputText id="email" type="email" [(ngModel)]="email" name="email" required placeholder="Introduce tu email" />
+      </div>
+
+      <div class="p-field">
+        <label for="password" style="color: white">Contraseña</label>
+        <p-password id="password" [(ngModel)]="password" name="password" required feedback="false" [toggleMask]="true" placeholder="Introduce tu contraseña"></p-password>
+      </div>
+
+      <div class="p-field">
+        <label for="direccion" style="color: white">Dirección</label>
+        <input pInputText id="direccion" [(ngModel)]="direccion" name="direccion" required placeholder="Introduce tu dirección" />
+      </div>
+
+      <div class="p-field">
+        <label for="telefono" style="color: white">Teléfono</label>
+        <input pInputText id="telefono" [(ngModel)]="telefono" name="telefono" required placeholder="Introduce tu teléfono" />
+      </div>
+
+      <div class="p-field">
+        <label for="fechaNacimiento" style="color: white">Fecha de Nacimiento</label>
+        <input pInputText id="fechaNacimiento" type="date" [(ngModel)]="fechaNacimiento" name="fechaNacimiento" required />
+      </div>
+
+      <p-divider></p-divider>
+
+      <button pButton label="Registrarse" icon="pi pi-user-plus" type="submit" class="registro-button"></button>
+      <div *ngIf="errorMessage" class="error-message p-mt-3">{{ errorMessage }}</div>
+    </form>
+    <p class="login-link">
+      ¿Ya tienes una cuenta? <a routerLink="/login" style="color: #007bff; font-weight: bold;">Inicia sesión aquí</a>.
+    </p>
+  </p-card>
+</div>
+

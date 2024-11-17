@@ -1,0 +1,55 @@
+  <h2>Carrito de Compras</h2>
+
+  <!-- Contenedor principal -->
+  <div class="contenido">
+    <!-- Tabla de productos -->
+    <div class="tabla-productos">
+      <p-table [value]="carritoProductos" [responsiveLayout]="'scroll'" [scrollable]="true" scrollHeight="60vh">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+            <th>Total</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-producto>
+          <tr>
+            <td>
+              <div class="producto-detalle">
+                <img [src]="producto.producto.imagen" alt="{{ producto.producto.nombre }}" />
+                <span>{{ producto.producto.nombre }}</span>
+              </div>
+            </td>
+            <td>{{ producto.cantidad }}</td>
+            <td>{{ producto.producto.precio | currency:'USD' }}</td>
+            <td>{{ producto.precioTotal | currency:'USD' }}</td>
+            <td>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-trash"
+                class="p-button-danger"
+                (click)="eliminarProducto(producto.id)"
+                label="Eliminar"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <!-- Resumen de pago en horizontal -->
+  <div class="resumen-pago-horizontal">
+    <div class="detalle">
+      <strong>Total de Ítems:</strong> {{ totalItems }}
+    </div>
+    <div class="detalle">
+      <strong>Total a Pagar:</strong> {{ totalPrecio | currency:'USD' }}
+    </div>
+    <div class="detalle">
+      <button pButton type="button" label="Pagar" class="p-button-success" (click)="pagarCarrito()"></button>
+    </div>
+  </div>

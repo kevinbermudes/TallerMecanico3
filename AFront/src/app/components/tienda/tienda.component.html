@@ -1,0 +1,55 @@
+<div class="tienda-container">
+  <div class="producto-card" *ngFor="let producto of productos">
+    <p-card>
+      <ng-template pTemplate="header">
+        <img [src]="getImagenUrl(producto)" alt="{{ producto.nombre }}" class="producto-imagen" loading="lazy" />
+      </ng-template>
+      <ng-template pTemplate="content">
+        <h3>{{ producto.nombre }}</h3>
+        <p>{{ producto.descripcion }}</p>
+        <p>Precio: ${{ producto.precio }}</p>
+        <p>Stock: {{ producto.stock }}</p>
+        <button pButton type="button" label="Agregar al Carrito" (click)="agregarAlCarrito(producto)" class="p-button-success"></button>
+        <button pButton type="button" label="Detalles" (click)="navigateToDetails(producto.id)" class="p-button-info"></button>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <button pButton type="button" label="Cambiar Imagen" icon="pi pi-upload" (click)="openChangeImageDialog(producto)" class="p-button-secondary"></button>
+      </ng-template>
+    </p-card>
+  </div>
+</div>
+
+<!-- Diálogo para cambiar la imagen -->
+<p-dialog header="Cambiar Imagen" [(visible)]="displayDialog" [modal]="true" [closable]="false" [style]="{width: '400px'}">
+  <div class="p-fluid">
+    <div class="p-field">
+      <label for="file">Seleccionar Nueva Imagen</label>
+      <input type="file" accept="image/*" (change)="onFileSelected($event)" id="file" />
+    </div>
+
+    <!-- Previsualización de la imagen seleccionada -->
+    <div class="p-field" *ngIf="previewImage">
+      <label>Vista Previa:</label>
+      <img [src]="previewImage" alt="Vista Previa" class="vista-previa-imagen" />
+    </div>
+
+    <!-- Barra de progreso de subida -->
+    <div class="p-field" *ngIf="uploadProgress > 0 && uploadProgress < 100">
+      <label>Subiendo Imagen:</label>
+      <p-progressBar [value]="uploadProgress"></p-progressBar>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div class="p-field" *ngIf="uploadError">
+      <p class="p-error">{{ uploadError }}</p>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" label="Cancelar" icon="pi pi-times" (click)="closeDialog()" class="p-button-text"></button>
+    <button pButton type="button" label="Subir" icon="pi pi-check" (click)="uploadImagen()" [disabled]="!newImageFile" class="p-button-success"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Mensajes de PrimeNG -->
+<p-toast></p-toast>

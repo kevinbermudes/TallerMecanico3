@@ -1,0 +1,95 @@
+/* Fondo con degradado */
+/* Contenedor principal del fondo */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Pseudo-elemento para la imagen de fondo borrosa */
+.login-container::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 110vw;
+  height: 110vh;
+  transform: translate(-50%, -50%); /* Centra el fondo */
+  background-image: url('https://www.deceroacien.com.mx/u/fotografias/m/2023/12/14/f1280x720-30942_162617_5050.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: blur(6px); /* Aplica el efecto borroso */
+  z-index: -1; /* Asegura que el fondo esté detrás del contenido */
+}
+
+/* Contenedor de la tarjeta de login */
+.login-overlay {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Tarjeta de login estilizada */
+::ng-deep .login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  border-radius: 10px;
+  background-color: rgba(58, 58, 58, 0.6);
+  color: #ffffff;
+  /* Ajuste de sombra para efecto hundido */
+  box-shadow: -2px -7px 28px -6px rgba(0,0,0,0.75);
+  border: 1px solid rgba(58, 58, 58, 0.6);
+}
+
+
+.login-card .p-card-header {
+  font-size: 1.5rem;
+  color: #7b4397;
+  font-weight: bold;
+}
+
+/* Estilo de los campos */
+.p-field label {
+  font-weight: bold;
+  color: #333;
+}
+
+.p-field input,
+.p-field p-password input {
+  border-radius: 5px;
+  padding: 0.75rem;
+}
+
+/* Estilo del botón de login */
+.login-button {
+  margin-top: 1rem;
+  width: 100%;
+  background-color: #000000;
+  border: none;
+  color: #ffffff;
+  font-weight: bold;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #777777;
+}
+
+/* Mensaje de error estilizado */
+.error-message {
+  color: #f44336;
+  font-size: 0.875rem;
+}
+
+/* Estilo del divisor */
+.p-divider {
+  margin: 1rem 0;
+  border-color: #ddd;
+}

@@ -1,0 +1,26 @@
+.cliente-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-item label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.form-footer {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}

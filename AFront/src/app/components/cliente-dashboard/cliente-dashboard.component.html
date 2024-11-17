@@ -1,0 +1,17 @@
+<div class="cliente-dashboard-container">
+  <!-- Barra de navegación -->
+  <p-menubar [model]="items">
+    <div class="cliente-info">
+      <span style="color:black">Bienvenido, {{ clienteNombre }}</span>
+    </div>
+    <button pButton icon="pi pi-power-off" label="Cerrar sesión" (click)="logout()"></button>
+  </p-menubar>
+
+  <!-- Área de contenido dinámico -->
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+
+
+

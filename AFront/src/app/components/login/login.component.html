@@ -1,0 +1,26 @@
+<div class="login-container">
+  <p-card header="Bienvenido" styleClass="login-card">
+    <form (ngSubmit)="login()" class="p-fluid">
+      <div class="p-field">
+        <label for="email" style="color: white">Email</label>
+        <input pInputText id="email" type="email" [(ngModel)]="email" name="email" required placeholder="Introduce tu email" />
+      </div>
+      <br>
+      <div class="p-field">
+        <label for="password" style="color: white">Contraseña</label>
+        <p-password id="password" [(ngModel)]="password" name="password" required feedback="false" [toggleMask]="true" placeholder="Introduce tu contraseña"></p-password>
+      </div>
+
+      <p-divider></p-divider>
+
+      <button pButton label="Login" icon="pi pi-sign-in" type="submit" class="login-button"></button>
+      <div *ngIf="errorMessage" class="error-message p-mt-3">{{ errorMessage }}</div>
+    </form>
+    <div class="register-link">
+      <!-- Enlace para redirigir a la página de registro -->
+      <p style="color: white; text-align: center; margin-top: 1rem;">
+        ¿No eres cliente aún? <a routerLink="/registro" style="color: #007bff; font-weight: bold;">Regístrate ahora</a>
+      </p>
+    </div>
+  </p-card>
+</div>

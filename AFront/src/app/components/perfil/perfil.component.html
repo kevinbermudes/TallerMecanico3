@@ -1,0 +1,75 @@
+<div class="perfil-container">
+  <h2>Perfil del Cliente</h2>
+
+  <form [formGroup]="clienteForm" (ngSubmit)="actualizarCliente()">
+    <div class="form-grid">
+      <div class="form-item">
+        <label for="primerNombre">Primer Nombre:</label>
+        <input id="primerNombre" pInputText formControlName="primerNombre" />
+      </div>
+      <div class="form-item">
+        <label for="segundoNombre">Segundo Nombre:</label>
+        <input id="segundoNombre" pInputText formControlName="segundoNombre" />
+      </div>
+      <div class="form-item">
+        <label for="primerApellido">Primer Apellido:</label>
+        <input id="primerApellido" pInputText formControlName="primerApellido" />
+      </div>
+      <div class="form-item">
+        <label for="segundoApellido">Segundo Apellido:</label>
+        <input id="segundoApellido" pInputText formControlName="segundoApellido" />
+      </div>
+      <div class="form-item">
+        <label for="direccion">Dirección:</label>
+        <input id="direccion" pInputText formControlName="direccion" />
+      </div>
+      <div class="form-item">
+        <label for="telefono">Teléfono:</label>
+        <input id="telefono" pInputText formControlName="telefono" />
+      </div>
+      <div class="form-item">
+        <label for="emailSecundario">Email Secundario:</label>
+        <input id="emailSecundario" pInputText formControlName="emailSecundario" />
+      </div>
+      <div class="form-item">
+        <label for="dni">DNI:</label>
+        <input id="dni" pInputText formControlName="dni" />
+      </div>
+      <div class="form-item">
+        <label for="fechaNacimiento">Fecha de Nacimiento:</label>
+        <input id="fechaNacimiento" type="date" pInputText formControlName="fechaNacimiento" />
+      </div>
+      <div class="form-item">
+        <label for="genero">Género:</label>
+        <p-dropdown
+          [options]="generos"
+          formControlName="genero">
+        </p-dropdown>
+      </div>
+      <div class="form-item">
+        <label for="estadoCivil">Estado Civil:</label>
+        <p-dropdown
+          [options]="estadosCiviles"
+          formControlName="estadoCivil">
+        </p-dropdown>
+      </div>
+      <div class="form-item">
+        <label for="ocupacion">Ocupación:</label>
+        <input id="ocupacion" pInputText formControlName="ocupacion" />
+      </div>
+      <div class="form-item">
+        <label for="notas">Notas:</label>
+        <textarea id="notas" formControlName="notas"></textarea>
+      </div>
+    </div>
+    <div class="form-footer">
+      <button
+        pButton
+        type="submit"
+        label="Actualizar"
+        [disabled]="!isFormChanged"
+        class="p-button-success"
+      ></button>
+    </div>
+  </form>
+</div>
