@@ -12,13 +12,25 @@ namespace TallerMecanico.Mapper
             CreateMap<Cliente, ClienteDto>().ReverseMap();
 
             // Mapeo de Carrito
-            CreateMap<Carrito, CarritoDto>().ReverseMap();
+            CreateMap<Carrito, CarritoDto>()
+                .ForMember(dest => dest.Producto, opt => opt.MapFrom(src => src.Producto))
+                .ForMember(dest => dest.Servicio, opt => opt.MapFrom(src => src.Servicio))
+                .ReverseMap();
 
             // Mapeo de CartaPago
             CreateMap<CartaPago, CartaPagoDto>().ReverseMap();
 
             // Mapeo de Factura
-            CreateMap<Factura, FacturaDto>().ReverseMap();
+            CreateMap<Factura, FacturaDto>()
+                .ForMember(dest => dest.ProductosFactura, opt => opt.MapFrom(src => src.ProductosFactura))
+                .ForMember(dest => dest.ServiciosFactura, opt => opt.MapFrom(src => src.ServiciosFactura))
+                .ReverseMap();
+
+            // Mapeo de ProductoFactura
+            CreateMap<ProductoFactura, ProductoFacturaDto>().ReverseMap();
+
+            // Mapeo de ServicioFactura
+            CreateMap<ServicioFactura, ServicioFacturaDto>().ReverseMap();
 
             // Mapeo de Notificacion
             CreateMap<Notificacion, NotificacionDto>().ReverseMap();

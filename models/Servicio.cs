@@ -6,9 +6,10 @@ public class Servicio
     public string Nombre { get; set; }
     public string Descripcion { get; set; }
     public decimal Precio { get; set; }
-
+    public string Imagen { get;set; }
     // Relación muchos a muchos con Clientes
-    public ICollection<Cliente> Clientes { get; set; } 
+    public ICollection<ClienteServicio> ClienteServicios { get; set; } = new List<ClienteServicio>();
+
     public ICollection<Vehiculo> Vehiculos { get; set; }
     // Auditoría
     public DateTime FechaCreacion { get; set; }

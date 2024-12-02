@@ -1,4 +1,5 @@
-﻿using TallerMecanico.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
+using TallerMecanico.Dtos;
 
 namespace TallerMecanico.Interface
 {
@@ -22,5 +23,8 @@ namespace TallerMecanico.Interface
         // Métodos específicos (si aplica)
         Task<IEnumerable<CartaPagoDto>> GetCartasPagoByClienteIdAsync(int clienteId);
         Task<IEnumerable<CartaPagoDto>> GetCartasPagoByFacturaIdAsync(int facturaId);
+        Task<IEnumerable<FacturaDto>> GetFacturasByCartaPagoIdAsync(int cartaPagoId);
+        Task<CartaPagoDto> CreateOrUpdateCartaPagoAsync(int clienteId, DateTime fechaVencimiento);
+
     }
 }

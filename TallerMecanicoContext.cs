@@ -16,7 +16,8 @@ public class TallerMecanicoContext : DbContext
     public DbSet<Notificacion> Notificaciones { get; set; }
     public DbSet<Carrito> Carritos { get; set; }
     public DbSet<Parte> Partes { get; set; }
-
+    public DbSet<ClienteServicio> ClienteServicios { get; set; } // Agregar DbSet para ClienteServicio
+    
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -74,23 +75,22 @@ public class TallerMecanicoContext : DbContext
             .WithMany()
             .HasForeignKey(p => p.ParteId)
             .OnDelete(DeleteBehavior.Restrict);
+// Relación muchos a muchos entre Cliente y Servicio con tabla intermedia explícita
+        modelBuilder.Entity<ClienteServicio>()
+            .HasKey(cs => new { cs.ClienteId, cs.ServicioId }); // Llave compuesta
 
-        // Relación muchos a muchos entre Cliente y Servicio
-        modelBuilder.Entity<Cliente>()
-            .HasMany(c => c.Servicios)
-            .WithMany(s => s.Clientes)
-            .UsingEntity<Dictionary<string, object>>(
-                "ClienteServicio",
-                cs => cs.HasOne<Servicio>()
-                    .WithMany()
-                    .HasForeignKey("ServicioId")
-                    .OnDelete(DeleteBehavior.Restrict),
-                cs => cs.HasOne<Cliente>()
-                    .WithMany()
-                    .HasForeignKey("ClienteId")
-                    .OnDelete(DeleteBehavior.Restrict)
-                
-            );
+        modelBuilder.Entity<ClienteServicio>()
+            .HasOne(cs => cs.Cliente)
+            .WithMany(c => c.ClienteServicios) // Ajusta la navegación si es necesario
+            .HasForeignKey(cs => cs.ClienteId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ClienteServicio>()
+            .HasOne(cs => cs.Servicio)
+            .WithMany(s => s.ClienteServicios) // Ajusta la navegación si es necesario
+            .HasForeignKey(cs => cs.ServicioId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         modelBuilder.Entity<Usuario>()
             .HasIndex(u => u.Email)
             .IsUnique();
@@ -121,7 +121,24 @@ public class TallerMecanicoContext : DbContext
             .HasOne(c => c.Producto)
             .WithMany(p => p.Carritos)
             .HasForeignKey(c => c.ProductoId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade) 
+            .IsRequired(false); 
+        // Relación uno a muchos entre Carrito y Servicio (opcional)
+
+        modelBuilder.Entity<Carrito>()
+            .HasOne(c => c.Servicio)
+            .WithMany()
+            .HasForeignKey(c => c.ServicioId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false); // 
+        
+        // Relación uno a muchos entre Carrito y Parte (opcional)
+        modelBuilder.Entity<Carrito>()
+            .HasOne(c => c.Parte)
+            .WithMany()
+            .HasForeignKey(c => c.ParteId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false); // Opcional
 
         // Índice único para el código de factura
         modelBuilder.Entity<Factura>()

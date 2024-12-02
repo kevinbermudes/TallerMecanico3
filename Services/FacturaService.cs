@@ -51,13 +51,24 @@ namespace TallerMecanico.Services
         public async Task<FacturaDto> CreateFacturaAsync(FacturaDto facturaDto)
         {
             var factura = _mapper.Map<Factura>(facturaDto);
+    
+            // Generar código único para la factura
+            factura.CodigoFactura = Guid.NewGuid().ToString().Substring(0, 8);
+    
+            // Establecer la fecha de creación
             factura.FechaCreacion = DateTime.UtcNow;
+
+            // Agregar la factura al contexto
             _context.Facturas.Add(factura);
             await _context.SaveChangesAsync();
+
+            // Notificar al cliente asociado
             await _hubContext.Clients.User(facturaDto.ClienteId.ToString())
-                .SendAsync("ReceiveNotification", "Nueva factura generada.");;
+                .SendAsync("ReceiveNotification", "Nueva factura generada.");
+
             return _mapper.Map<FacturaDto>(factura);
         }
+
 
         // Actualizar una factura existente
         public async Task UpdateFacturaAsync(int id, FacturaDto facturaDto)
@@ -86,15 +97,17 @@ namespace TallerMecanico.Services
         }
 
         // Obtener facturas por cliente
-        public async Task<IEnumerable<FacturaDto>> GetFacturasByClienteIdAsync(int clienteId)
+        public async Task<List<FacturaDto>> GetFacturasByClienteIdAsync(int clienteId)
         {
             var facturas = await _context.Facturas
                 .Where(f => f.ClienteId == clienteId && !f.EstaBorrado)
-                .Include(f => f.Cliente)
-                .Include(f => f.CartasPago)
+                .Include(f => f.ProductosFactura)
+                .ThenInclude(pf => pf.Producto)
+                .Include(f => f.ServiciosFactura)
+                .ThenInclude(sf => sf.Servicio)
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<FacturaDto>>(facturas);
+            return _mapper.Map<List<FacturaDto>>(facturas);
         }
 
         // Obtener facturas por estado

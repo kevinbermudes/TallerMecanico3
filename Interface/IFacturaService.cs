@@ -21,7 +21,8 @@ namespace TallerMecanico.Interface
         Task DeleteFacturaAsync(int id);
 
         // Métodos específicos (si aplica)
-        Task<IEnumerable<FacturaDto>> GetFacturasByClienteIdAsync(int clienteId);
+        Task<List<FacturaDto>> GetFacturasByClienteIdAsync(int clienteId);        
         Task<IEnumerable<FacturaDto>> GetFacturasByEstadoAsync(EstadoFactura estado);
+        
     }
 }

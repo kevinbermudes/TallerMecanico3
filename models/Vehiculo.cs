@@ -7,7 +7,7 @@ public class Vehiculo
     public Cliente Cliente { get; set; }
     public string Marca { get; set; }
     public string Modelo { get; set; }
-    public int Año { get; set; }
+    public int year { get; set; }
     public string Placa { get; set; }
 
     // Relación con los servicios realizados al vehículo

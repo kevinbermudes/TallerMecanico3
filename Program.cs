@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
 using TallerMecanico;
 using TallerMecanico.Hubs;
@@ -8,6 +9,7 @@ using TallerMecanico.Mapper;
 using TallerMecanico.Interface;
 using TallerMecanico.Services;
 using Amazon.S3;
+using Stripe;
 using TallerMecanico.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,10 +27,11 @@ builder.Services.AddCors(options =>
 // Servicios adicionales
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.WriteIndented = true;
 });
-
+// Configurar Stripe
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 // Configuración de autenticación JWT
 builder.Services.AddAuthentication(options =>
 {
@@ -92,6 +95,8 @@ builder.Services.AddScoped<IServicioService, ServicioService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IVehiculoService, VehiculoService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
+builder.Services.AddScoped<PaymentService>();
+
 
 // Configurar AWS S3
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());

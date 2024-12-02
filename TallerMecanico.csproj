@@ -23,6 +23,7 @@
         </PackageReference>
         <PackageReference Include="Microsoft.OpenApi" Version="1.6.22" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.0" />
+        <PackageReference Include="Stripe.net" Version="47.1.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
     </ItemGroup>
 

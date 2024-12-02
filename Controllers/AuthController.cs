@@ -15,11 +15,15 @@ namespace TallerMecanico.Controllers
         private readonly IUsuarioService _usuarioService;
         private readonly IConfiguration _configuration;
         private readonly IClienteService _clienteService;
+        private readonly TallerMecanicoContext _context;
 
-        public AuthController(IUsuarioService usuarioService, IConfiguration configuration)
+        public AuthController(IUsuarioService usuarioService, IConfiguration configuration, 
+            TallerMecanicoContext context)
         {
             _usuarioService = usuarioService;
             _configuration = configuration;
+            _context = context; 
+
         }
 
         [HttpPost("login")]
@@ -43,18 +47,29 @@ namespace TallerMecanico.Controllers
 
         private string GenerateJwtToken(UsuarioDto user)
         {
+            // Consulta para obtener el Id del cliente asociado al usuario
+            int? clienteId = _context.Clientes
+                .Where(c => c.UsuarioId == user.Id)
+                .Select(c => c.Id)
+                .FirstOrDefault();
+
+            if (clienteId == null)
+            {
+                throw new InvalidOperationException("No se encontró un cliente asociado al usuario.");
+            }
+
+            // Definir los claims del token, asignando el clienteId como el valor de Sub
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-             //   new Claim(ClaimTypes.Name, user.Email),
+                new Claim(JwtRegisteredClaimNames.Sub, clienteId.ToString()), // Usar Id del cliente en Sub
                 new Claim("email", user.Email),
                 new Claim("nombre", user.Nombre),
                 new Claim("role", user.Rol.ToString())
-                
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
@@ -65,6 +80,7 @@ namespace TallerMecanico.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
         
         [HttpPost("registro")]
         public async Task<IActionResult> Registro([FromBody] RegistroDto registroDto)

@@ -13,13 +13,22 @@ namespace TallerMecanico.Services
         private readonly TallerMecanicoContext _context;
         private readonly IMapper _mapper;
         private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly PaymentService _paymentService;
+        private readonly ICartaPagoService _cartaPagoService;
 
-        public CarritoService(TallerMecanicoContext context, IMapper mapper, IHubContext<NotificationHub> hubContext)
+
+        public CarritoService(
+            PaymentService paymentService,
+            TallerMecanicoContext context,
+            IMapper mapper,
+            IHubContext<NotificationHub> hubContext,
+            ICartaPagoService cartaPagoService)
         {
             _context = context;
             _mapper = mapper;
             _hubContext = hubContext;
-
+            _paymentService = paymentService;
+            _cartaPagoService = cartaPagoService; // Asignar la dependencia inyectada
         }
 
         // Obtener todos los carritos
@@ -91,11 +100,13 @@ namespace TallerMecanico.Services
             var carritos = await _context.Carritos
                 .Where(c => c.ClienteId == clienteId && !c.EstaBorrado)
                 .Include(c => c.Cliente)
-                .Include(c => c.Producto)
+                .Include(c => c.Producto) // Incluye datos del producto
+                .Include(c => c.Servicio) // Incluye datos del servicio
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<CarritoDto>>(carritos);
         }
+
 
         // Obtener carritos por producto
         public async Task<IEnumerable<CarritoDto>> GetCarritosByProductoIdAsync(int productoId)
@@ -155,6 +166,127 @@ namespace TallerMecanico.Services
             // Mapear y devolver el DTO del carrito creado
             return _mapper.Map<CarritoDto>(carrito);
         }
+
+     
+        public async Task<Carrito> AgregarAlCarritoServicioAsync(CarritoAgregarservicioDto carritoAgregarDto)
+        {
+            var servicio = await _context.Servicios.FindAsync(carritoAgregarDto.ServicioId);
+            if (servicio == null)
+            {
+                throw new KeyNotFoundException("Servicio no encontrado.");
+            }
+
+            var carrito = new Carrito
+            {
+                ClienteId = carritoAgregarDto.ClienteId,
+                ServicioId = carritoAgregarDto.ServicioId,
+                Cantidad = 1, // Asume cantidad predeterminada para servicios
+                PrecioTotal = servicio.Precio, // Usa el precio del servicio
+                FechaCreacion = DateTime.UtcNow
+            };
+
+            _context.Carritos.Add(carrito);
+            await _context.SaveChangesAsync();
+
+            return carrito;
+        }
+public async Task<Factura> ConfirmarPagoAsync(int clienteId, string paymentIntentId)
+{
+    // Verificar el estado del PaymentIntent
+    var paymentIntent = await _paymentService.VerificarIntentoPagoAsync(paymentIntentId);
+
+    if (paymentIntent == null || !paymentIntent.Status.Equals("succeeded", StringComparison.OrdinalIgnoreCase))
+    {
+        throw new InvalidOperationException("El pago no fue exitoso. Verifica el intento de pago.");
+    }
+
+    // Obtener ítems del carrito
+    var carritos = await _context.Carritos
+        .Where(c => c.ClienteId == clienteId && !c.EstaBorrado)
+        .Include(c => c.Producto)
+        .Include(c => c.Servicio)
+        .ToListAsync();
+
+    if (!carritos.Any())
+    {
+        throw new InvalidOperationException("No hay ítems en el carrito para procesar.");
+    }
+
+    decimal total = 0;
+
+    // Crear una nueva factura
+    var factura = new Factura
+    {
+        ClienteId = clienteId,
+        CodigoFactura = Guid.NewGuid().ToString().Substring(0, 8),
+        Total = 0,
+        FechaCreacion = DateTime.UtcNow,
+        FechaVencimiento = DateTime.UtcNow.AddDays(30), // Factura vence en 30 días
+        Estado = EstadoFactura.Pagada, // Estado inicial como pagada
+        ProductosFactura = new List<ProductoFactura>(),
+        ServiciosFactura = new List<ServicioFactura>()
+    };
+
+    _context.Facturas.Add(factura);
+
+    foreach (var carrito in carritos)
+    {
+        if (carrito.Producto != null)
+        {
+            total += carrito.Producto.Precio * carrito.Cantidad;
+
+            // Reducir el stock del producto
+            carrito.Producto.Stock -= carrito.Cantidad;
+
+            // Agregar a ProductoFactura
+            factura.ProductosFactura.Add(new ProductoFactura
+            {
+                FacturaId = factura.Id,
+                ProductoId = carrito.Producto.Id,
+                Cantidad = carrito.Cantidad,
+                PrecioUnitario = carrito.Producto.Precio
+            });
+        }
+        else if (carrito.Servicio != null)
+        {
+            total += carrito.Servicio.Precio;
+
+            // Agregar a ServicioFactura
+            factura.ServiciosFactura.Add(new ServicioFactura
+            {
+                FacturaId = factura.Id,
+                ServicioId = carrito.Servicio.Id,
+                Precio = carrito.Servicio.Precio
+            });
+
+            // Asignar servicio al cliente usando ClienteServicio
+            _context.ClienteServicios.Add(new ClienteServicio
+            {
+                ClienteId = clienteId,
+                ServicioId = carrito.Servicio.Id,
+                FechaAsignacion = DateTime.UtcNow
+            });
+        }
+
+        // Eliminar ítem del carrito
+        _context.Carritos.Remove(carrito);
+    }
+
+    // Actualizar el total de la factura
+    factura.Total = total;
+
+    // Guardar cambios en la base de datos
+    await _context.SaveChangesAsync();
+
+    return factura;
+}
+
+
+
+
+
+
+
 
     }
 }

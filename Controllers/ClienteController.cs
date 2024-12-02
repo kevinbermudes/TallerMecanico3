@@ -9,10 +9,13 @@ namespace TallerMecanico.Controllers
     public class ClienteController : ControllerBase
     {
         private readonly IClienteService _clienteService;
+        private readonly TallerMecanicoContext _context;
 
-        public ClienteController(IClienteService clienteService)
+        public ClienteController(IClienteService clienteService,TallerMecanicoContext context)
         {
             _clienteService = clienteService;
+            _context = context;
+
         }
 
         // Obtener todos los clientes
@@ -130,5 +133,22 @@ namespace TallerMecanico.Controllers
             var vehiculos = await _clienteService.GetVehiculosByClienteIdAsync(id);
             return Ok(vehiculos);
         }
+        [HttpPut("{id}/reactivar")]
+        public async Task<IActionResult> ReactivarCliente(int id)
+        {
+            var cliente = await _context.Clientes.FindAsync(id);
+            if (cliente == null)
+            {
+                return NotFound("Cliente no encontrado.");
+            }
+
+            cliente.EstaBorrado = false;
+            cliente.FechaActualizacion = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
     }
 }

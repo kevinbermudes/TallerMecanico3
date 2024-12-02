@@ -22,21 +22,6 @@ namespace TallerMecanico.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ClienteServicio", b =>
-                {
-                    b.Property<int>("ClienteId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ServicioId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("ClienteId", "ServicioId");
-
-                    b.HasIndex("ServicioId");
-
-                    b.ToTable("ClienteServicio");
-                });
-
             modelBuilder.Entity("TallerMecanico.models.Carrito", b =>
                 {
                     b.Property<int>("Id")
@@ -63,17 +48,27 @@ namespace TallerMecanico.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("ParteId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("PrecioTotal")
                         .HasColumnType("numeric");
 
-                    b.Property<int>("ProductoId")
+                    b.Property<int?>("ProductoId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ServicioId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ClienteId");
 
+                    b.HasIndex("ParteId");
+
                     b.HasIndex("ProductoId");
+
+                    b.HasIndex("ServicioId");
 
                     b.ToTable("Carritos");
                 });
@@ -195,6 +190,24 @@ namespace TallerMecanico.Migrations
                     b.ToTable("Clientes");
                 });
 
+            modelBuilder.Entity("TallerMecanico.models.ClienteServicio", b =>
+                {
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ServicioId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("FechaAsignacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("ClienteId", "ServicioId");
+
+                    b.HasIndex("ServicioId");
+
+                    b.ToTable("ClienteServicios");
+                });
+
             modelBuilder.Entity("TallerMecanico.models.Factura", b =>
                 {
                     b.Property<int>("Id")
@@ -207,6 +220,10 @@ namespace TallerMecanico.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("CodigoFactura")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Comentarios")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -425,6 +442,35 @@ namespace TallerMecanico.Migrations
                     b.ToTable("Productos");
                 });
 
+            modelBuilder.Entity("TallerMecanico.models.ProductoFactura", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FacturaId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("PrecioUnitario")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FacturaId");
+
+                    b.HasIndex("ProductoId");
+
+                    b.ToTable("ProductoFactura");
+                });
+
             modelBuilder.Entity("TallerMecanico.models.Servicio", b =>
                 {
                     b.Property<int>("Id")
@@ -432,6 +478,9 @@ namespace TallerMecanico.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ClienteId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
@@ -449,6 +498,10 @@ namespace TallerMecanico.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Imagen")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("text");
@@ -458,7 +511,35 @@ namespace TallerMecanico.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ClienteId");
+
                     b.ToTable("Servicios");
+                });
+
+            modelBuilder.Entity("TallerMecanico.models.ServicioFactura", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FacturaId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Precio")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("ServicioId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FacturaId");
+
+                    b.HasIndex("ServicioId");
+
+                    b.ToTable("ServicioFactura");
                 });
 
             modelBuilder.Entity("TallerMecanico.models.Usuario", b =>
@@ -522,9 +603,6 @@ namespace TallerMecanico.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Año")
-                        .HasColumnType("integer");
-
                     b.Property<int>("ClienteId")
                         .HasColumnType("integer");
 
@@ -552,6 +630,9 @@ namespace TallerMecanico.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("year")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ClienteId");
@@ -574,21 +655,6 @@ namespace TallerMecanico.Migrations
                     b.ToTable("VehiculoServicio");
                 });
 
-            modelBuilder.Entity("ClienteServicio", b =>
-                {
-                    b.HasOne("TallerMecanico.models.Cliente", null)
-                        .WithMany()
-                        .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TallerMecanico.models.Servicio", null)
-                        .WithMany()
-                        .HasForeignKey("ServicioId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("TallerMecanico.models.Carrito", b =>
                 {
                     b.HasOne("TallerMecanico.models.Cliente", "Cliente")
@@ -597,15 +663,28 @@ namespace TallerMecanico.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("TallerMecanico.models.Parte", "Parte")
+                        .WithMany()
+                        .HasForeignKey("ParteId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("TallerMecanico.models.Producto", "Producto")
                         .WithMany("Carritos")
                         .HasForeignKey("ProductoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("TallerMecanico.models.Servicio", "Servicio")
+                        .WithMany()
+                        .HasForeignKey("ServicioId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Cliente");
 
+                    b.Navigation("Parte");
+
                     b.Navigation("Producto");
+
+                    b.Navigation("Servicio");
                 });
 
             modelBuilder.Entity("TallerMecanico.models.CartaPago", b =>
@@ -636,6 +715,25 @@ namespace TallerMecanico.Migrations
                         .IsRequired();
 
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("TallerMecanico.models.ClienteServicio", b =>
+                {
+                    b.HasOne("TallerMecanico.models.Cliente", "Cliente")
+                        .WithMany("ClienteServicios")
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TallerMecanico.models.Servicio", "Servicio")
+                        .WithMany("ClienteServicios")
+                        .HasForeignKey("ServicioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Cliente");
+
+                    b.Navigation("Servicio");
                 });
 
             modelBuilder.Entity("TallerMecanico.models.Factura", b =>
@@ -703,6 +801,52 @@ namespace TallerMecanico.Migrations
                     b.Navigation("Cliente");
                 });
 
+            modelBuilder.Entity("TallerMecanico.models.ProductoFactura", b =>
+                {
+                    b.HasOne("TallerMecanico.models.Factura", "Factura")
+                        .WithMany("ProductosFactura")
+                        .HasForeignKey("FacturaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TallerMecanico.models.Producto", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Factura");
+
+                    b.Navigation("Producto");
+                });
+
+            modelBuilder.Entity("TallerMecanico.models.Servicio", b =>
+                {
+                    b.HasOne("TallerMecanico.models.Cliente", null)
+                        .WithMany("Servicios")
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("TallerMecanico.models.ServicioFactura", b =>
+                {
+                    b.HasOne("TallerMecanico.models.Factura", "Factura")
+                        .WithMany("ServiciosFactura")
+                        .HasForeignKey("FacturaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TallerMecanico.models.Servicio", "Servicio")
+                        .WithMany()
+                        .HasForeignKey("ServicioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Factura");
+
+                    b.Navigation("Servicio");
+                });
+
             modelBuilder.Entity("TallerMecanico.models.Vehiculo", b =>
                 {
                     b.HasOne("TallerMecanico.models.Cliente", "Cliente")
@@ -735,11 +879,15 @@ namespace TallerMecanico.Migrations
 
                     b.Navigation("CartasPago");
 
+                    b.Navigation("ClienteServicios");
+
                     b.Navigation("Facturas");
 
                     b.Navigation("Notificaciones");
 
                     b.Navigation("Pagos");
+
+                    b.Navigation("Servicios");
 
                     b.Navigation("Vehiculos");
                 });
@@ -747,11 +895,20 @@ namespace TallerMecanico.Migrations
             modelBuilder.Entity("TallerMecanico.models.Factura", b =>
                 {
                     b.Navigation("CartasPago");
+
+                    b.Navigation("ProductosFactura");
+
+                    b.Navigation("ServiciosFactura");
                 });
 
             modelBuilder.Entity("TallerMecanico.models.Producto", b =>
                 {
                     b.Navigation("Carritos");
+                });
+
+            modelBuilder.Entity("TallerMecanico.models.Servicio", b =>
+                {
+                    b.Navigation("ClienteServicios");
                 });
 #pragma warning restore 612, 618
         }

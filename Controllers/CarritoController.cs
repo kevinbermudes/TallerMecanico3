@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TallerMecanico.Dtos;
 using TallerMecanico.Interface;
+using TallerMecanico.models;
+using TallerMecanico.Services;
 
 namespace TallerMecanico.Controllers
 {
@@ -9,9 +12,12 @@ namespace TallerMecanico.Controllers
     public class CarritoController : ControllerBase
     {
         private readonly ICarritoService _carritoService;
+        private readonly PaymentService _paymentService;
 
-        public CarritoController(ICarritoService carritoService)
+
+        public CarritoController(PaymentService paymentService, ICarritoService carritoService)
         {
+            _paymentService = paymentService;
             _carritoService = carritoService;
         }
 
@@ -104,6 +110,75 @@ namespace TallerMecanico.Controllers
                 return BadRequest(new { message = "Error al agregar el producto al carrito.", details = ex.Message });
             }
         }
+        [HttpPost("agregar-al-carrito-servicio")]
+        public async Task<IActionResult> AgregarAlCarritoServicio([FromBody] CarritoAgregarservicioDto carritoAgregarDto)
+        {
+            try
+            {
+                var carritoCreado = await _carritoService.AgregarAlCarritoServicioAsync(carritoAgregarDto);
+                return CreatedAtAction(nameof(GetCarritoById), new { id = carritoCreado.Id }, carritoCreado);
+            }
+            catch (DbUpdateException dbEx)
+            {
+                return BadRequest(new
+                {
+                    message = "Error al agregar el servicio al carrito.",
+                    details = dbEx.InnerException?.Message ?? dbEx.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    message = "Error general al agregar el servicio al carrito.",
+                    details = ex.Message
+                });
+            }
+        }
+        [HttpPost("create-payment-intent")]
+        public async Task<IActionResult> CreatePaymentIntent([FromBody] PaymentIntentCreateRequest request)
+        {
+            try
+            {
+                var paymentIntent = await _paymentService.CreatePaymentIntentAsync(request.Amount, request.Currency);
+                return Ok(new { clientSecret = paymentIntent.ClientSecret });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al crear el intento de pago.", details = ex.Message });
+            }
+        }
+
+        [HttpPost("confirmar-pago")]
+        public async Task<IActionResult> ConfirmarPago([FromBody] ConfirmarPagoRequest request)
+        {
+            try
+            {
+                var paymentIntent = await _paymentService.VerificarIntentoPagoAsync(request.PaymentIntentId);
+
+                if (paymentIntent == null)
+                {
+                    return BadRequest(new { message = "Intento de pago no encontrado." });
+                }
+
+              
+
+                var factura = await _carritoService.ConfirmarPagoAsync(request.ClienteId, request.PaymentIntentId);
+
+                return Ok(new { message = "Pago procesado correctamente.", factura });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al confirmar el pago.", details = ex.Message });
+            }
+        }
+
+
+
 
     }
+
+
+
+    
 }

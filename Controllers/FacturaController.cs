@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using TallerMecanico.Dtos;
 using TallerMecanico.Interface;
 using TallerMecanico.models;
@@ -41,11 +42,20 @@ namespace TallerMecanico.Controllers
 
         // Crear una nueva factura
         [HttpPost]
-        public async Task<ActionResult<FacturaDto>> CreateFactura(FacturaDto facturaDto)
+        public async Task<IActionResult> CreateFactura([FromBody] FacturaDto facturaDto)
         {
+            Console.WriteLine($"Payload recibido: {JsonConvert.SerializeObject(facturaDto)}");
+
+            if (facturaDto == null)
+            {
+                return BadRequest(new { message = "La factura es requerida." });
+            }
+
             var nuevaFactura = await _facturaService.CreateFacturaAsync(facturaDto);
             return CreatedAtAction(nameof(GetFacturaById), new { id = nuevaFactura.Id }, nuevaFactura);
         }
+
+
 
         // Actualizar una factura existente
         [HttpPut("{id}")]

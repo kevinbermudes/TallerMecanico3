@@ -81,8 +81,15 @@ namespace TallerMecanico.Controllers
         public async Task<ActionResult<IEnumerable<CartaPagoDto>>> GetCartasPagoByClienteId(int clienteId)
         {
             var cartasPago = await _cartaPagoService.GetCartasPagoByClienteIdAsync(clienteId);
+
+            if (cartasPago == null || !cartasPago.Any())
+            {
+                return Ok(new List<CartaPagoDto>()); // Devuelve una lista vacía si no hay datos
+            }
+
             return Ok(cartasPago);
         }
+
 
         // Obtener cartas de pago por factura
         [HttpGet("factura/{facturaId}")]
@@ -91,5 +98,24 @@ namespace TallerMecanico.Controllers
             var cartasPago = await _cartaPagoService.GetCartasPagoByFacturaIdAsync(facturaId);
             return Ok(cartasPago);
         }
+        [HttpGet("{id}/facturas")]
+        public async Task<ActionResult<IEnumerable<FacturaDto>>> GetFacturasByCartaPagoId(int id)
+        {
+            try
+            {
+                var facturas = await _cartaPagoService.GetFacturasByCartaPagoIdAsync(id);
+                return Ok(facturas);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al obtener las facturas de la carta de pago.", details = ex.Message });
+            }
+        }
+
+
     }
 }

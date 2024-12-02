@@ -1,4 +1,5 @@
-﻿namespace TallerMecanico.models;
+﻿
+namespace TallerMecanico.models;
 
 public class Cliente
 {
@@ -23,12 +24,13 @@ public class Cliente
 
     // Relación con otras entidades
     public ICollection<Vehiculo> Vehiculos { get; set; }
-    public ICollection<Servicio> Servicios { get; set; } 
+    public ICollection<Servicio> Servicios  { get; set; } // Relación explícita con ClienteServicio
     public ICollection<Factura> Facturas { get; set; }
     public ICollection<Pago> Pagos { get; set; }
     public ICollection<CartaPago> CartasPago { get; set; } 
     public ICollection<Notificacion> Notificaciones { get; set; } 
     public ICollection<Carrito> Carritos { get; set; }
+    public ICollection<ClienteServicio> ClienteServicios { get; set; } = new List<ClienteServicio>(); // Agregado
 
     // Auditoría
     public DateTime FechaCreacion { get; set; }
@@ -36,6 +38,7 @@ public class Cliente
     public DateTime? FechaBorrado { get; set; }
     public bool EstaBorrado { get; set; } = false;
 }
+
 
 // Enum para Género
 public enum Genero

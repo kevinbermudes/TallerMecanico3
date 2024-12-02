@@ -1,4 +1,5 @@
-﻿namespace TallerMecanico.models;
+﻿
+namespace TallerMecanico.models;
 
 public class Producto
 {

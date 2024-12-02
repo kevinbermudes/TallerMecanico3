@@ -22,7 +22,8 @@ namespace TallerMecanico.Services
         {
             var clientes = await _context.Clientes
                 .Include(c => c.Usuario)
-                .Where(c => !c.EstaBorrado)
+                .Include(c=> c.Vehiculos)
+                .Include(c=> c.Facturas)
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<ClienteDto>>(clientes);
@@ -155,11 +156,12 @@ namespace TallerMecanico.Services
         public async Task<IEnumerable<ServicioDto>> GetServiciosByClienteIdAsync(int clienteId)
         {
             var servicios = await _context.Servicios
-                .Where(s => s.Clientes.Any(c => c.Id == clienteId) && !s.EstaBorrado)
+                .Where(s => s.ClienteServicios.Any(cs => cs.ClienteId == clienteId) && !s.EstaBorrado)
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<ServicioDto>>(servicios);
         }
+
 
         // Obtener vehículos por ClienteId
         public async Task<IEnumerable<VehiculoDto>> GetVehiculosByClienteIdAsync(int clienteId)

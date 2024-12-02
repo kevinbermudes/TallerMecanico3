@@ -21,8 +21,6 @@ namespace TallerMecanico.Services
         public async Task<IEnumerable<ServicioDto>> GetAllServiciosAsync()
         {
             var servicios = await _context.Servicios
-                .Include(s => s.Clientes)
-                .Include(s => s.Vehiculos)
                 .Where(s => !s.EstaBorrado)
                 .ToListAsync();
 
@@ -33,8 +31,6 @@ namespace TallerMecanico.Services
         public async Task<ServicioDto> GetServicioByIdAsync(int id)
         {
             var servicio = await _context.Servicios
-                .Include(s => s.Clientes)
-                .Include(s => s.Vehiculos)
                 .FirstOrDefaultAsync(s => s.Id == id && !s.EstaBorrado);
 
             if (servicio == null)
@@ -84,8 +80,9 @@ namespace TallerMecanico.Services
         public async Task<IEnumerable<ServicioDto>> GetServiciosByClienteIdAsync(int clienteId)
         {
             var servicios = await _context.Servicios
-                .Where(s => s.Clientes.Any(c => c.Id == clienteId) && !s.EstaBorrado)
-                .Include(s => s.Clientes)
+                .Where(s => s.ClienteServicios.Any(cs => cs.ClienteId == clienteId) && !s.EstaBorrado)
+                .Include(s => s.ClienteServicios)
+                .ThenInclude(cs => cs.Cliente)
                 .Include(s => s.Vehiculos)
                 .ToListAsync();
 
@@ -95,42 +92,51 @@ namespace TallerMecanico.Services
         // Agregar cliente a servicio
         public async Task AddClienteToServicioAsync(int servicioId, int clienteId)
         {
+            // Verificar si el servicio existe
             var servicio = await _context.Servicios
-                .Include(s => s.Clientes)
+                .Include(s => s.ClienteServicios)
                 .FirstOrDefaultAsync(s => s.Id == servicioId && !s.EstaBorrado);
-
-            var cliente = await _context.Clientes.FindAsync(clienteId);
 
             if (servicio == null)
                 throw new KeyNotFoundException("Servicio no encontrado.");
-            
+
+            // Verificar si el cliente existe
+            var cliente = await _context.Clientes.FindAsync(clienteId);
             if (cliente == null)
                 throw new KeyNotFoundException("Cliente no encontrado.");
 
-            if (!servicio.Clientes.Contains(cliente))
+            // Verificar si la relación ya existe
+            var existeRelacion = servicio.ClienteServicios
+                .Any(cs => cs.ClienteId == clienteId);
+
+            if (!existeRelacion)
             {
-                servicio.Clientes.Add(cliente);
+                // Crear la relación solo si no existe
+                servicio.ClienteServicios.Add(new ClienteServicio
+                {
+                    ClienteId = clienteId,
+                    ServicioId = servicioId,
+                    FechaAsignacion = DateTime.UtcNow
+                });
+
                 await _context.SaveChangesAsync();
             }
         }
+
 
         // Eliminar cliente de servicio
         public async Task RemoveClienteFromServicioAsync(int servicioId, int clienteId)
         {
-            var servicio = await _context.Servicios
-                .Include(s => s.Clientes)
-                .FirstOrDefaultAsync(s => s.Id == servicioId && !s.EstaBorrado);
+            var clienteServicio = await _context.Set<ClienteServicio>()
+                .FirstOrDefaultAsync(cs => cs.ServicioId == servicioId && cs.ClienteId == clienteId);
 
-            if (servicio == null)
-                throw new KeyNotFoundException("Servicio no encontrado.");
+            if (clienteServicio == null)
+                throw new KeyNotFoundException("La relación entre el cliente y el servicio no existe.");
 
-            var cliente = servicio.Clientes.FirstOrDefault(c => c.Id == clienteId);
-            if (cliente != null)
-            {
-                servicio.Clientes.Remove(cliente);
-                await _context.SaveChangesAsync();
-            }
+            _context.Set<ClienteServicio>().Remove(clienteServicio);
+            await _context.SaveChangesAsync();
         }
+
 
         // Agregar vehiculo a servicio
         public async Task AddVehiculoToServicioAsync(int servicioId, int vehiculoId)
@@ -175,13 +181,14 @@ namespace TallerMecanico.Services
         public async Task<IEnumerable<ServicioDto>> GetServiciosByVehiculoIdAsync(int vehiculoId)
         {
             var servicios = await _context.Servicios
-                .Where(s => s.Vehiculos.Any(v => v.Id == vehiculoId) && !s.EstaBorrado)
-                .Include(s => s.Clientes)
+                .Where(s => s.Vehiculos.Any(v => v.Id == vehiculoId && !v.EstaBorrado) && !s.EstaBorrado)
+                .Include(s => s.ClienteServicios)
                 .Include(s => s.Vehiculos)
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<ServicioDto>>(servicios);
         }
+
 
     }
 }

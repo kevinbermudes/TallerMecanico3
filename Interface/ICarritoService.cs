@@ -1,4 +1,5 @@
 ﻿using TallerMecanico.Dtos;
+using TallerMecanico.models;
 
 namespace TallerMecanico.Interface
 {
@@ -23,5 +24,8 @@ namespace TallerMecanico.Interface
         Task<IEnumerable<CarritoDto>> GetCarritosByClienteIdAsync(int clienteId);
         Task<IEnumerable<CarritoDto>> GetCarritosByProductoIdAsync(int productoId);
         Task<CarritoDto> AgregarAlCarritoAsync(CarritoAgregarDto carritoAgregarDto);
+        Task<Carrito> AgregarAlCarritoServicioAsync(CarritoAgregarservicioDto carritoAgregarDto);
+        Task<Factura> ConfirmarPagoAsync(int clienteId, string paymentIntentId);
+
     }
 }
