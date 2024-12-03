@@ -30,5 +30,7 @@ namespace TallerMecanico.Interface
         // Métodos para manejar la relación muchos a muchos con Vehiculo
         Task AddVehiculoToServicioAsync(int servicioId, int vehiculoId); // Nueva función
         Task RemoveVehiculoFromServicioAsync(int servicioId, int vehiculoId); // Nueva función
+        Task ReactivarServicioAsync(int id);
+
     }
 }

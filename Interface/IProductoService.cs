@@ -23,5 +23,7 @@ namespace TallerMecanico.Interface
         // Métodos específicos
         Task<IEnumerable<ProductoDto>> GetProductosByCategoriaAsync(CategoriaProducto categoria);
         Task UpdateStockAsync(int id, int cantidad);
+        Task ReactivarProductoAsync(int id);
+
     }
 }

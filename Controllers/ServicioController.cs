@@ -198,52 +198,52 @@ namespace TallerMecanico.Controllers
                 return StatusCode(500, $"Error al obtener la imagen: {ex.Message}");
             }
         }
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateServicio(int id, [FromForm] ServicioDto servicioDto, [FromForm] IFormFile imagen)
-        {
-            try
+            [HttpPut("{id}")]
+            public async Task<IActionResult> UpdateServicio(int id, [FromForm] ServicioDto servicioDto, [FromForm] IFormFile? imagen)
             {
-                if (imagen != null && imagen.Length > 0)
+                try
                 {
-                    // Validar el archivo si es necesario
+                    if (imagen != null && imagen.Length > 0)
+                    {
+                        // Validar el archivo si es necesario
 
-                    // Validar el tipo y tamaño del archivo
-                    var tiposPermitidos = new[] { ".jpg", ".jpeg", ".png", ".gif" };
-                    var extension = Path.GetExtension(imagen.FileName).ToLowerInvariant();
+                        // Validar el tipo y tamaño del archivo
+                        var tiposPermitidos = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                        var extension = Path.GetExtension(imagen.FileName).ToLowerInvariant();
 
-                    if (!tiposPermitidos.Contains(extension))
-                        return BadRequest("Tipo de archivo no permitido. Solo se permiten imágenes (jpg, jpeg, png, gif).");
+                        if (!tiposPermitidos.Contains(extension))
+                            return BadRequest("Tipo de archivo no permitido. Solo se permiten imágenes (jpg, jpeg, png, gif).");
 
-                    if (imagen.Length > 5 * 1024 * 1024) // 5 MB como ejemplo
-                        return BadRequest("El archivo es demasiado grande. El tamaño máximo permitido es 5 MB.");
+                        if (imagen.Length > 5 * 1024 * 1024) // 5 MB como ejemplo
+                            return BadRequest("El archivo es demasiado grande. El tamaño máximo permitido es 5 MB.");
 
-                    // Generar un nombre de archivo único
-                    string nombreArchivo = $"{Guid.NewGuid()}{extension}";
+                        // Generar un nombre de archivo único
+                        string nombreArchivo = $"{Guid.NewGuid()}{extension}";
 
-                    string bucketName = _configuration["AWS:BucketName"]?.Trim();
+                        string bucketName = _configuration["AWS:BucketName"]?.Trim();
 
-                    // Subir la imagen a S3
-                    string url = await _s3Service.UploadFileAsync(imagen.OpenReadStream(), nombreArchivo, bucketName);
+                        // Subir la imagen a S3
+                        string url = await _s3Service.UploadFileAsync(imagen.OpenReadStream(), nombreArchivo, bucketName);
 
-                    // Asignar la URL de la imagen al servicio
-                    servicioDto.Imagen = url;
+                        // Asignar la URL de la imagen al servicio
+                        servicioDto.Imagen = url;
+                    }
+
+                    await _servicioService.UpdateServicioAsync(id, servicioDto);
+                    return NoContent();
                 }
-
-                await _servicioService.UpdateServicioAsync(id, servicioDto);
-                return NoContent();
+                catch (KeyNotFoundException ex)
+                {
+                    return NotFound(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(400, $"Error al actualizar el servicio: {ex.Message}");
+                }
             }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al actualizar el servicio: {ex.Message}");
-            }
-        }
 
         [HttpPost]
-        public async Task<ActionResult<ServicioDto>> CreateServicio([FromForm] ServicioDto servicioDto, [FromForm] IFormFile imagen)
+        public async Task<ActionResult<ServicioDto>> CreateServicio([FromForm] ServicioDto servicioDto, [FromForm] IFormFile? imagen)
         {
             try
             {
@@ -278,7 +278,7 @@ namespace TallerMecanico.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error al crear el servicio: {ex.Message}");
+                return StatusCode(400, $"Error al crear el servicio: {ex.Message}");
             }
         }
         [HttpDelete("{servicioId}/cliente/{clienteId}")]
@@ -299,6 +299,23 @@ namespace TallerMecanico.Controllers
             }
         }
 
+        [HttpPatch("{id}/reactivar")]
+        public async Task<IActionResult> ReactivarServicio(int id)
+        {
+            try
+            {
+                await _servicioService.ReactivarServicioAsync(id);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al reactivar el servicio: {ex.Message}");
+            }
+        }
 
 
 

@@ -22,7 +22,6 @@ namespace TallerMecanico.Services
         {
             var productos = await _context.Productos
                 .Include(p => p.Carritos)
-                .Where(p => !p.EstaBorrado)
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<ProductoDto>>(productos);
@@ -110,5 +109,18 @@ namespace TallerMecanico.Services
             producto.FechaActualizacion = DateTime.UtcNow;
             await _context.SaveChangesAsync();
         }
+        public async Task ReactivarProductoAsync(int id)
+        {
+            var producto = await _context.Productos.FindAsync(id);
+
+            if (producto == null || !producto.EstaBorrado)
+                throw new KeyNotFoundException("Producto no encontrado o ya está activo.");
+
+            producto.EstaBorrado = false;
+            producto.FechaBorrado = null;
+            producto.FechaActualizacion = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

@@ -21,7 +21,6 @@ namespace TallerMecanico.Services
         public async Task<IEnumerable<ServicioDto>> GetAllServiciosAsync()
         {
             var servicios = await _context.Servicios
-                .Where(s => !s.EstaBorrado)
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<ServicioDto>>(servicios);
@@ -188,6 +187,23 @@ namespace TallerMecanico.Services
 
             return _mapper.Map<IEnumerable<ServicioDto>>(servicios);
         }
+        public async Task ReactivarServicioAsync(int id)
+        {
+            var servicio = await _context.Servicios.FindAsync(id);
+
+            if (servicio == null)
+                throw new KeyNotFoundException("Servicio no encontrado.");
+
+            if (!servicio.EstaBorrado)
+                throw new InvalidOperationException("El servicio ya está activo.");
+
+            servicio.EstaBorrado = false;
+            servicio.FechaBorrado = null;
+            servicio.FechaActualizacion = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+        }
+
 
 
     }

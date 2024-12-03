@@ -58,7 +58,7 @@ namespace TallerMecanico.Controllers
 
         // Crear un nuevo producto
         [HttpPost]
-        public async Task<ActionResult<ProductoDto>> CreateProducto([FromForm] ProductoDto productoDto, [FromForm] IFormFile imagen)
+        public async Task<ActionResult<ProductoDto>> CreateProducto([FromForm] ProductoDto productoDto, [FromForm] IFormFile? imagen)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace TallerMecanico.Controllers
                     // Generar un nombre de archivo único
                     string nombreArchivo = $"{Guid.NewGuid()}{extension}";
 
-                    string bucketName = "tu-bucket-s3"; // Reemplaza con el nombre real de tu bucket
+                    string bucketName =_configuration["AWS:BucketName"]?.Trim(); // Reemplaza con el nombre real de tu bucket
 
                     // Subir la imagen a S3
                     string url = await _s3Service.UploadFileAsync(imagen.OpenReadStream(), nombreArchivo, bucketName);
@@ -99,7 +99,7 @@ namespace TallerMecanico.Controllers
 
         // Actualizar un producto existente
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProducto(int id, [FromForm] ProductoDto productoDto, [FromForm] IFormFile imagen)
+        public async Task<IActionResult> UpdateProducto(int id, [FromForm] ProductoDto productoDto, [FromForm] IFormFile? imagen)
         {
             try
             {
@@ -120,7 +120,7 @@ namespace TallerMecanico.Controllers
                     // Generar un nombre de archivo único
                     string nombreArchivo = $"{Guid.NewGuid()}{extension}";
 
-                    string bucketName = "tu-bucket-s3"; // Reemplaza con el nombre real de tu bucket
+                    string bucketName = _configuration["AWS:BucketName"]?.Trim(); // Reemplaza con el nombre real de tu bucket
 
                     // Subir la imagen a S3
                     string url = await _s3Service.UploadFileAsync(imagen.OpenReadStream(), nombreArchivo, bucketName);
@@ -254,5 +254,19 @@ namespace TallerMecanico.Controllers
                 return StatusCode(500, $"Error al obtener la imagen: {ex.Message}");
             }
         }
+        [HttpPatch("{id}/reactivar")]
+        public async Task<IActionResult> ReactivarProducto(int id)
+        {
+            try
+            {
+                await _productoService.ReactivarProductoAsync(id);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
     }
 }
