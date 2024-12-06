@@ -190,96 +190,157 @@ namespace TallerMecanico.Services
 
             return carrito;
         }
-public async Task<Factura> ConfirmarPagoAsync(int clienteId, string paymentIntentId)
+public async Task<IEnumerable<Factura>> ConfirmarPagoAsync(int clienteId, string paymentIntentId, int? facturaId = null, List<int>? facturaIds = null)
 {
-    // Verificar el estado del PaymentIntent
-    var paymentIntent = await _paymentService.VerificarIntentoPagoAsync(paymentIntentId);
+    var paymentIntentResult = await _paymentService.VerificarIntentoPagoAsync(paymentIntentId);
 
-    if (paymentIntent == null || !paymentIntent.Status.Equals("succeeded", StringComparison.OrdinalIgnoreCase))
+    if (paymentIntentResult == null || !paymentIntentResult.Status.Equals("succeeded", StringComparison.OrdinalIgnoreCase))
     {
         throw new InvalidOperationException("El pago no fue exitoso. Verifica el intento de pago.");
     }
 
-    // Obtener ítems del carrito
-    var carritos = await _context.Carritos
-        .Where(c => c.ClienteId == clienteId && !c.EstaBorrado)
-        .Include(c => c.Producto)
-        .Include(c => c.Servicio)
-        .ToListAsync();
+    var facturasPagadas = new List<Factura>();
 
-    if (!carritos.Any())
+    if (facturaId.HasValue)
     {
-        throw new InvalidOperationException("No hay ítems en el carrito para procesar.");
+        // Pago de una factura específica
+        var factura = await _context.Facturas
+            .Include(f => f.ProductosFactura)
+            .Include(f => f.ServiciosFactura)
+            .FirstOrDefaultAsync(f => f.Id == facturaId.Value && f.ClienteId == clienteId);
+
+        if (factura == null)
+            throw new KeyNotFoundException("Factura no encontrada o no pertenece al cliente.");
+
+        if (factura.Estado == EstadoFactura.Pagada)
+            throw new InvalidOperationException("La factura ya está pagada.");
+
+        factura.Estado = EstadoFactura.Pagada;
+        factura.FechaActualizacion = DateTime.UtcNow;
+        facturasPagadas.Add(factura);
+
+        await ActualizarCartaPagoAsync(factura);
+    }
+    else if (facturaIds != null && facturaIds.Any())
+    {
+        // Pago de múltiples facturas
+        foreach (var id in facturaIds)
+        {
+            var factura = await _context.Facturas
+                .Include(f => f.ProductosFactura)
+                .Include(f => f.ServiciosFactura)
+                .FirstOrDefaultAsync(f => f.Id == id && f.ClienteId == clienteId);
+
+            if (factura == null)
+                throw new KeyNotFoundException($"Factura con ID {id} no encontrada o no pertenece al cliente.");
+
+            if (factura.Estado == EstadoFactura.Pagada)
+                continue;
+
+            factura.Estado = EstadoFactura.Pagada;
+            factura.FechaActualizacion = DateTime.UtcNow;
+            facturasPagadas.Add(factura);
+
+            await ActualizarCartaPagoAsync(factura);
+        }
+    }
+    else
+    {
+        // Pago de ítems del carrito (ninguna factura específica)
+        var carritos = await _context.Carritos
+            .Where(c => c.ClienteId == clienteId && !c.EstaBorrado)
+            .Include(c => c.Producto)
+            .Include(c => c.Servicio)
+            .ToListAsync();
+
+        if (!carritos.Any())
+            throw new InvalidOperationException("No hay ítems en el carrito para procesar.");
+
+        decimal total = 0;
+
+        var factura = new Factura
+        {
+            ClienteId = clienteId,
+            CodigoFactura = Guid.NewGuid().ToString().Substring(0, 8),
+            Total = 0,
+            FechaCreacion = DateTime.UtcNow,
+            FechaVencimiento = DateTime.UtcNow.AddDays(30),
+            Estado = EstadoFactura.Pagada,
+            ProductosFactura = new List<ProductoFactura>(),
+            ServiciosFactura = new List<ServicioFactura>(),
+            Comentarios = "factura pagada correctamente desde carrito"
+        };
+
+        _context.Facturas.Add(factura);
+
+        foreach (var carrito in carritos)
+        {
+            if (carrito.Producto != null)
+            {
+                total += carrito.Producto.Precio * carrito.Cantidad;
+                carrito.Producto.Stock -= carrito.Cantidad;
+
+                factura.ProductosFactura.Add(new ProductoFactura
+                {
+                    FacturaId = factura.Id,
+                    ProductoId = carrito.Producto.Id,
+                    Cantidad = carrito.Cantidad,
+                    PrecioUnitario = carrito.Producto.Precio
+                });
+            }
+            else if (carrito.Servicio != null)
+            {
+                total += carrito.Servicio.Precio;
+
+                factura.ServiciosFactura.Add(new ServicioFactura
+                {
+                    FacturaId = factura.Id,
+                    ServicioId = carrito.Servicio.Id,
+                    Precio = carrito.Servicio.Precio
+                });
+
+                _context.ClienteServicios.Add(new ClienteServicio
+                {
+                    ClienteId = clienteId,
+                    ServicioId = carrito.Servicio.Id,
+                    FechaAsignacion = DateTime.UtcNow
+                });
+            }
+
+            _context.Carritos.Remove(carrito);
+        }
+
+        factura.Total = total;
+        facturasPagadas.Add(factura);
     }
 
-    decimal total = 0;
-
-    // Crear una nueva factura
-    var factura = new Factura
-    {
-        ClienteId = clienteId,
-        CodigoFactura = Guid.NewGuid().ToString().Substring(0, 8),
-        Total = 0,
-        FechaCreacion = DateTime.UtcNow,
-        FechaVencimiento = DateTime.UtcNow.AddDays(30), // Factura vence en 30 días
-        Estado = EstadoFactura.Pagada, // Estado inicial como pagada
-        ProductosFactura = new List<ProductoFactura>(),
-        ServiciosFactura = new List<ServicioFactura>()
-    };
-
-    _context.Facturas.Add(factura);
-
-    foreach (var carrito in carritos)
-    {
-        if (carrito.Producto != null)
-        {
-            total += carrito.Producto.Precio * carrito.Cantidad;
-
-            // Reducir el stock del producto
-            carrito.Producto.Stock -= carrito.Cantidad;
-
-            // Agregar a ProductoFactura
-            factura.ProductosFactura.Add(new ProductoFactura
-            {
-                FacturaId = factura.Id,
-                ProductoId = carrito.Producto.Id,
-                Cantidad = carrito.Cantidad,
-                PrecioUnitario = carrito.Producto.Precio
-            });
-        }
-        else if (carrito.Servicio != null)
-        {
-            total += carrito.Servicio.Precio;
-
-            // Agregar a ServicioFactura
-            factura.ServiciosFactura.Add(new ServicioFactura
-            {
-                FacturaId = factura.Id,
-                ServicioId = carrito.Servicio.Id,
-                Precio = carrito.Servicio.Precio
-            });
-
-            // Asignar servicio al cliente usando ClienteServicio
-            _context.ClienteServicios.Add(new ClienteServicio
-            {
-                ClienteId = clienteId,
-                ServicioId = carrito.Servicio.Id,
-                FechaAsignacion = DateTime.UtcNow
-            });
-        }
-
-        // Eliminar ítem del carrito
-        _context.Carritos.Remove(carrito);
-    }
-
-    // Actualizar el total de la factura
-    factura.Total = total;
-
-    // Guardar cambios en la base de datos
     await _context.SaveChangesAsync();
-
-    return factura;
+    return facturasPagadas;
 }
+
+private async Task ActualizarCartaPagoAsync(Factura factura)
+{
+    // Asegúrate de incluir la Factura en FacturaCartaPagos
+    var cartaPago = await _context.CartasPago
+        .Include(cp => cp.FacturaCartaPagos)
+        .ThenInclude(fcp => fcp.Factura) // Importante para evitar el null
+        .FirstOrDefaultAsync(cp => cp.FacturaCartaPagos.Any(fcp => fcp.FacturaId == factura.Id));
+
+    if (cartaPago != null)
+    {
+        // Asumiendo que Total no es nulo. Si fuese nullable, manejarlo con ?? 0.
+        cartaPago.Monto -= factura.Total;
+
+        // Verificar si quedan facturas pendientes
+        var facturasPendientes = cartaPago.FacturaCartaPagos.Any(fcp => fcp.Factura != null && fcp.Factura.Estado == EstadoFactura.Pendiente);
+        if (!facturasPendientes)
+        {
+            cartaPago.EstaBorrado = true;
+        }
+    }
+}
+
+
 
 
 

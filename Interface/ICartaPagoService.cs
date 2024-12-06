@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using TallerMecanico.Dtos;
+﻿using TallerMecanico.Dtos;
 
 namespace TallerMecanico.Interface
 {
@@ -8,23 +7,18 @@ namespace TallerMecanico.Interface
         // Obtener todas las cartas de pago
         Task<IEnumerable<CartaPagoDto>> GetAllCartasPagoAsync();
 
-        // Obtener una carta de pago específica por ID, incluyendo Cliente y Factura
+        // Obtener una carta de pago específica por ID, incluyendo Cliente y Facturas asociadas
         Task<CartaPagoDto> GetCartaPagoByIdAsync(int id);
 
-        // Crear una nueva carta de pago
-        Task<CartaPagoDto> CreateCartaPagoAsync(CartaPagoDto cartaPagoDto);
-
-        // Actualizar una carta de pago existente
-        Task UpdateCartaPagoAsync(int id, CartaPagoDto cartaPagoDto);
-
-        // Borrado lógico de una carta de pago
-        Task DeleteCartaPagoAsync(int id);
-
-        // Métodos específicos (si aplica)
-        Task<IEnumerable<CartaPagoDto>> GetCartasPagoByClienteIdAsync(int clienteId);
-        Task<IEnumerable<CartaPagoDto>> GetCartasPagoByFacturaIdAsync(int facturaId);
-        Task<IEnumerable<FacturaDto>> GetFacturasByCartaPagoIdAsync(int cartaPagoId);
+        // Crear o actualizar una carta de pago según las facturas pendientes
         Task<CartaPagoDto> CreateOrUpdateCartaPagoAsync(int clienteId, DateTime fechaVencimiento);
+
+        // Eliminar lógicamente una carta de pago si no tiene facturas pendientes
+        Task DeleteCartaPagoIfNoPendingInvoicesAsync(int cartaPagoId);
+
+        // Obtener todas las cartas de pago por cliente, incluyendo las facturas asociadas
+        Task<IEnumerable<CartaPagoDto>> GetCartasPagoByClienteIdAsync(int clienteId);
+        Task<IEnumerable<FacturaDto>> GetFacturasByCartaPagoIdAsync(int cartaPagoId);
 
     }
 }

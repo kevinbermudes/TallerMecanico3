@@ -17,12 +17,14 @@ public class TallerMecanicoContext : DbContext
     public DbSet<Carrito> Carritos { get; set; }
     public DbSet<Parte> Partes { get; set; }
     public DbSet<ClienteServicio> ClienteServicios { get; set; } // Agregar DbSet para ClienteServicio
-    
+    public DbSet<FacturaCartaPago> FacturaCartaPagos { get; set; }
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseNpgsql(
-            "Host=localhost;Username=kevin;Password=1234;Database=mydatabase");
+            "Host=localhost;Username=kevin;Password=1234;Database=mydatabase")
+            .LogTo(Console.WriteLine, LogLevel.Information);
         base.OnConfiguring(optionsBuilder);
         
     }
@@ -48,7 +50,9 @@ public class TallerMecanicoContext : DbContext
             .HasOne(cp => cp.Factura)
             .WithMany(f => f.CartasPago)
             .HasForeignKey(cp => cp.FacturaId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false);;
+        
 
         // Relación uno a muchos entre Cliente y Pago
         modelBuilder.Entity<Pago>()
@@ -178,6 +182,35 @@ public class TallerMecanicoContext : DbContext
             .WithMany(c => c.Pagos)
             .HasForeignKey(p => p.ClienteId)
             .OnDelete(DeleteBehavior.Restrict);
+        // Configuración de FacturaCartaPago (relación muchos a muchos)
+        modelBuilder.Entity<FacturaCartaPago>()
+            .HasKey(fcp => new { fcp.FacturaId, fcp.CartaPagoId }); // Clave compuesta
+
+        modelBuilder.Entity<FacturaCartaPago>()
+            .HasOne(fcp => fcp.Factura)
+            .WithMany(f => f.FacturaCartaPagos)
+            .HasForeignKey(fcp => fcp.FacturaId);
+
+        modelBuilder.Entity<FacturaCartaPago>()
+            .HasOne(fcp => fcp.CartaPago)
+            .WithMany(cp => cp.FacturaCartaPagos)
+            .HasForeignKey(fcp => fcp.CartaPagoId);
+        modelBuilder.Entity<ProductoFactura>()
+            .HasOne(pf => pf.Factura)
+            .WithMany(f => f.ProductosFactura)
+            .HasForeignKey(pf => pf.FacturaId);
+
+        modelBuilder.Entity<ServicioFactura>()
+            .HasOne(sf => sf.Factura)
+            .WithMany(f => f.ServiciosFactura)
+            .HasForeignKey(sf => sf.FacturaId);
+        modelBuilder.Entity<ProductoFactura>()
+            .Property(pf => pf.Cantidad)
+            .IsRequired();
+
+        modelBuilder.Entity<ServicioFactura>()
+            .Property(sf => sf.Precio)
+            .IsRequired();
 
 
         // Deshabilitar el borrado en cascada

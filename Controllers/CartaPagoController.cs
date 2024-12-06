@@ -38,41 +38,37 @@ namespace TallerMecanico.Controllers
             }
         }
 
-        // Crear una nueva carta de pago
-        [HttpPost]
-        public async Task<ActionResult<CartaPagoDto>> CreateCartaPago(CartaPagoDto cartaPagoDto)
-        {
-            var nuevaCartaPago = await _cartaPagoService.CreateCartaPagoAsync(cartaPagoDto);
-            return CreatedAtAction(nameof(GetCartaPagoById), new { id = nuevaCartaPago.Id }, nuevaCartaPago);
-        }
-
-        // Actualizar una carta de pago existente
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCartaPago(int id, CartaPagoDto cartaPagoDto)
+        // Crear o actualizar una carta de pago
+        [HttpPost("create-or-update")]
+        public async Task<ActionResult<CartaPagoDto>> CreateOrUpdateCartaPago(int clienteId, DateTime fechaVencimiento)
         {
             try
             {
-                await _cartaPagoService.UpdateCartaPagoAsync(id, cartaPagoDto);
+                var cartaPago = await _cartaPagoService.CreateOrUpdateCartaPagoAsync(clienteId, fechaVencimiento);
+                return Ok(cartaPago);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al crear o actualizar la carta de pago.", details = ex.Message });
+            }
+        }
+
+        // Eliminar una carta de pago lógicamente si no tiene facturas pendientes
+        [HttpDelete("{id}/check-delete")]
+        public async Task<IActionResult> DeleteCartaPagoIfNoPendingInvoices(int id)
+        {
+            try
+            {
+                await _cartaPagoService.DeleteCartaPagoIfNoPendingInvoicesAsync(id);
                 return NoContent();
             }
             catch (KeyNotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
-        }
-
-        // Borrado lógico de una carta de pago
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCartaPago(int id)
-        {
-            try
+            catch (Exception ex)
             {
-                await _cartaPagoService.DeleteCartaPagoAsync(id);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
+                return BadRequest(new { message = "Error al eliminar la carta de pago.", details = ex.Message });
             }
         }
 
@@ -90,14 +86,7 @@ namespace TallerMecanico.Controllers
             return Ok(cartasPago);
         }
 
-
-        // Obtener cartas de pago por factura
-        [HttpGet("factura/{facturaId}")]
-        public async Task<ActionResult<IEnumerable<CartaPagoDto>>> GetCartasPagoByFacturaId(int facturaId)
-        {
-            var cartasPago = await _cartaPagoService.GetCartasPagoByFacturaIdAsync(facturaId);
-            return Ok(cartasPago);
-        }
+        // Obtener facturas asociadas a una carta de pago
         [HttpGet("{id}/facturas")]
         public async Task<ActionResult<IEnumerable<FacturaDto>>> GetFacturasByCartaPagoId(int id)
         {
@@ -115,7 +104,5 @@ namespace TallerMecanico.Controllers
                 return BadRequest(new { message = "Error al obtener las facturas de la carta de pago.", details = ex.Message });
             }
         }
-
-
     }
 }

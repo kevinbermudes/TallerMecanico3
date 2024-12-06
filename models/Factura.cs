@@ -10,7 +10,8 @@ public class Factura
     public DateTime FechaCreacion { get; set; }
     public DateTime FechaVencimiento { get; set; }
     public EstadoFactura Estado { get; set; }
-    public string Comentarios { get; set; } // Nuevo campo
+    public string Comentarios { get; set; } 
+    public ICollection<FacturaCartaPago> FacturaCartaPagos { get; set; } = new List<FacturaCartaPago>();
 
     public ICollection<CartaPago> CartasPago { get; set; }
     public ICollection<ProductoFactura> ProductosFactura { get; set; }

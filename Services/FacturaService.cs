@@ -14,7 +14,7 @@ namespace TallerMecanico.Services
         private readonly IMapper _mapper;
         private readonly IHubContext<NotificationHub> _hubContext;
 
-        public FacturaService(IHubContext<NotificationHub> hubContext,TallerMecanicoContext context, IMapper mapper)
+        public FacturaService(IHubContext<NotificationHub> hubContext, TallerMecanicoContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -26,7 +26,8 @@ namespace TallerMecanico.Services
         {
             var facturas = await _context.Facturas
                 .Include(f => f.Cliente)
-                .Include(f => f.CartasPago)
+                .Include(f => f.FacturaCartaPagos)
+                .ThenInclude(fcp => fcp.CartaPago)
                 .Where(f => !f.EstaBorrado)
                 .ToListAsync();
 
@@ -38,7 +39,8 @@ namespace TallerMecanico.Services
         {
             var factura = await _context.Facturas
                 .Include(f => f.Cliente)
-                .Include(f => f.CartasPago)
+                .Include(f => f.FacturaCartaPagos)
+                .ThenInclude(fcp => fcp.CartaPago)
                 .FirstOrDefaultAsync(f => f.Id == id && !f.EstaBorrado);
 
             if (factura == null)
@@ -48,27 +50,70 @@ namespace TallerMecanico.Services
         }
 
         // Crear una nueva factura
-        public async Task<FacturaDto> CreateFacturaAsync(FacturaDto facturaDto)
+public async Task<FacturaDto> CreateFacturaAsync(FacturaDto facturaDto)
+{
+    var factura = _mapper.Map<Factura>(facturaDto);
+
+    // Generar un código único para la factura
+    factura.CodigoFactura = Guid.NewGuid().ToString().Substring(0, 8);
+    factura.FechaCreacion = DateTime.UtcNow;
+
+    // Guardar la factura primero
+    _context.Facturas.Add(factura);
+    await _context.SaveChangesAsync(); // Factura.Id ahora es conocido
+
+    // Si la factura es pendiente, crear o asociar una carta de pago
+    if (factura.Estado == EstadoFactura.Pendiente)
+    {
+        // Buscar o crear una carta de pago para la misma fecha de vencimiento
+        var cartaPago = await _context.CartasPago
+            .FirstOrDefaultAsync(cp =>
+                cp.ClienteId == factura.ClienteId &&
+                cp.FechaPago.Date == factura.FechaVencimiento.Date &&
+                !cp.EstaBorrado);
+
+        if (cartaPago == null)
         {
-            var factura = _mapper.Map<Factura>(facturaDto);
-    
-            // Generar código único para la factura
-            factura.CodigoFactura = Guid.NewGuid().ToString().Substring(0, 8);
-    
-            // Establecer la fecha de creación
-            factura.FechaCreacion = DateTime.UtcNow;
+            // Crear una nueva carta de pago
+            cartaPago = new CartaPago
+            {
+                ClienteId = factura.ClienteId,
+                FechaPago = factura.FechaVencimiento,
+                Monto = factura.Total,
+                MetodoPago = MetodoPago.Pasarela,
+                FechaCreacion = DateTime.UtcNow
+            };
 
-            // Agregar la factura al contexto
-            _context.Facturas.Add(factura);
+            _context.CartasPago.Add(cartaPago);
+            await _context.SaveChangesAsync(); // Guarda para generar CartaPago.Id
+        }
+        else
+        {
+            // Actualizar el monto de la carta de pago existente
+            cartaPago.Monto += factura.Total;
+            cartaPago.FechaActualizacion = DateTime.UtcNow;
+            _context.CartasPago.Update(cartaPago);
             await _context.SaveChangesAsync();
-
-            // Notificar al cliente asociado
-            await _hubContext.Clients.User(facturaDto.ClienteId.ToString())
-                .SendAsync("ReceiveNotification", "Nueva factura generada.");
-
-            return _mapper.Map<FacturaDto>(factura);
         }
 
+        // Asociar la factura a la carta de pago mediante la tabla relacional
+        var facturaCartaPago = new FacturaCartaPago
+        {
+            FacturaId = factura.Id,
+            CartaPagoId = cartaPago.Id
+        };
+        _context.FacturaCartaPagos.Add(facturaCartaPago);
+    }
+
+    // Guardar los cambios finales
+    await _context.SaveChangesAsync();
+
+    // Notificar al cliente asociado
+    await _hubContext.Clients.User(factura.ClienteId.ToString())
+        .SendAsync("ReceiveNotification", "Nueva factura generada.");
+
+    return _mapper.Map<FacturaDto>(factura);
+}
 
         // Actualizar una factura existente
         public async Task UpdateFacturaAsync(int id, FacturaDto facturaDto)
@@ -116,7 +161,8 @@ namespace TallerMecanico.Services
             var facturas = await _context.Facturas
                 .Where(f => f.Estado == estado && !f.EstaBorrado)
                 .Include(f => f.Cliente)
-                .Include(f => f.CartasPago)
+                .Include(f => f.FacturaCartaPagos)
+                .ThenInclude(fcp => fcp.CartaPago)
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<FacturaDto>>(facturas);

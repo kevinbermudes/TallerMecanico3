@@ -25,7 +25,9 @@ namespace TallerMecanico.Interface
         Task<IEnumerable<CarritoDto>> GetCarritosByProductoIdAsync(int productoId);
         Task<CarritoDto> AgregarAlCarritoAsync(CarritoAgregarDto carritoAgregarDto);
         Task<Carrito> AgregarAlCarritoServicioAsync(CarritoAgregarservicioDto carritoAgregarDto);
-        Task<Factura> ConfirmarPagoAsync(int clienteId, string paymentIntentId);
 
+        Task<IEnumerable<Factura>> ConfirmarPagoAsync(int clienteId, string paymentIntentId, int? facturaId = null,
+            List<int> facturaIds = null);
+        
     }
 }

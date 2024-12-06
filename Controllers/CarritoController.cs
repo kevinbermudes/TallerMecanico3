@@ -161,17 +161,32 @@ namespace TallerMecanico.Controllers
                     return BadRequest(new { message = "Intento de pago no encontrado." });
                 }
 
-              
+                IEnumerable<Factura> facturas;
 
-                var factura = await _carritoService.ConfirmarPagoAsync(request.ClienteId, request.PaymentIntentId);
+                if (request.FacturaId.HasValue)
+                {
+                    // Pago de una factura específica
+                    facturas = await _carritoService.ConfirmarPagoAsync(request.ClienteId, request.PaymentIntentId, request.FacturaId);
+                }
+                else if (request.FacturaIds != null && request.FacturaIds.Any())
+                {
+                    // Pago de varias facturas
+                    facturas = await _carritoService.ConfirmarPagoAsync(request.ClienteId, request.PaymentIntentId, null, request.FacturaIds);
+                }
+                else
+                {
+                    // Pago de ítems del carrito
+                    facturas = await _carritoService.ConfirmarPagoAsync(request.ClienteId, request.PaymentIntentId);
+                }
 
-                return Ok(new { message = "Pago procesado correctamente.", factura });
+                return Ok(new { message = "Pago procesado correctamente.", facturas });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = "Error al confirmar el pago.", details = ex.Message });
             }
         }
+
 
 
 

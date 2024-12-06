@@ -87,7 +87,7 @@ namespace TallerMecanico.Migrations
                     b.Property<bool>("EstaBorrado")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("FacturaId")
+                    b.Property<int?>("FacturaId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("FechaActualizacion")
@@ -256,6 +256,24 @@ namespace TallerMecanico.Migrations
                         .IsUnique();
 
                     b.ToTable("Facturas");
+                });
+
+            modelBuilder.Entity("TallerMecanico.models.FacturaCartaPago", b =>
+                {
+                    b.Property<int>("FacturaId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CartaPagoId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("FechaAsociacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("FacturaId", "CartaPagoId");
+
+                    b.HasIndex("CartaPagoId");
+
+                    b.ToTable("FacturaCartaPagos");
                 });
 
             modelBuilder.Entity("TallerMecanico.models.Notificacion", b =>
@@ -698,8 +716,7 @@ namespace TallerMecanico.Migrations
                     b.HasOne("TallerMecanico.models.Factura", "Factura")
                         .WithMany("CartasPago")
                         .HasForeignKey("FacturaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Cliente");
 
@@ -745,6 +762,25 @@ namespace TallerMecanico.Migrations
                         .IsRequired();
 
                     b.Navigation("Cliente");
+                });
+
+            modelBuilder.Entity("TallerMecanico.models.FacturaCartaPago", b =>
+                {
+                    b.HasOne("TallerMecanico.models.CartaPago", "CartaPago")
+                        .WithMany("FacturaCartaPagos")
+                        .HasForeignKey("CartaPagoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TallerMecanico.models.Factura", "Factura")
+                        .WithMany("FacturaCartaPagos")
+                        .HasForeignKey("FacturaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CartaPago");
+
+                    b.Navigation("Factura");
                 });
 
             modelBuilder.Entity("TallerMecanico.models.Notificacion", b =>
@@ -873,6 +909,11 @@ namespace TallerMecanico.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TallerMecanico.models.CartaPago", b =>
+                {
+                    b.Navigation("FacturaCartaPagos");
+                });
+
             modelBuilder.Entity("TallerMecanico.models.Cliente", b =>
                 {
                     b.Navigation("Carritos");
@@ -895,6 +936,8 @@ namespace TallerMecanico.Migrations
             modelBuilder.Entity("TallerMecanico.models.Factura", b =>
                 {
                     b.Navigation("CartasPago");
+
+                    b.Navigation("FacturaCartaPagos");
 
                     b.Navigation("ProductosFactura");
 

@@ -3,13 +3,15 @@
 public class CartaPago
 {
     public int Id { get; set; }
-    public int FacturaId { get; set; }
+    public int? FacturaId { get; set; }
     public Factura Factura { get; set; }
     public int ClienteId { get; set; } 
     public Cliente Cliente { get; set; }
     public decimal Monto { get; set; }
     public DateTime FechaPago { get; set; }
     public MetodoPago MetodoPago { get; set; }
+    public ICollection<FacturaCartaPago> FacturaCartaPagos { get; set; } = new List<FacturaCartaPago>();
+
 
     // Auditoría
     public DateTime FechaCreacion { get; set; }
