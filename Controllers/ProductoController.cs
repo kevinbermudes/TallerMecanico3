@@ -62,11 +62,9 @@ namespace TallerMecanico.Controllers
         {
             try
             {
+                // Validar y subir la imagen
                 if (imagen != null && imagen.Length > 0)
                 {
-                    // Validar el archivo si es necesario
-
-                    // Validar el tipo y tamaño del archivo
                     var tiposPermitidos = new[] { ".jpg", ".jpeg", ".png", ".gif" };
                     var extension = Path.GetExtension(imagen.FileName).ToLowerInvariant();
 
@@ -76,19 +74,18 @@ namespace TallerMecanico.Controllers
                     if (imagen.Length > 5 * 1024 * 1024) // 5 MB como ejemplo
                         return BadRequest("El archivo es demasiado grande. El tamaño máximo permitido es 5 MB.");
 
-                    // Generar un nombre de archivo único
                     string nombreArchivo = $"{Guid.NewGuid()}{extension}";
+                    string bucketName = _configuration["AWS:BucketName"]?.Trim();
 
-                    string bucketName =_configuration["AWS:BucketName"]?.Trim(); // Reemplaza con el nombre real de tu bucket
-
-                    // Subir la imagen a S3
                     string url = await _s3Service.UploadFileAsync(imagen.OpenReadStream(), nombreArchivo, bucketName);
-
-                    // Asignar la URL de la imagen al producto
                     productoDto.Imagen = url;
                 }
 
+                // Asignar una categoría predeterminada si no está presente
+                productoDto.Categoria ??= (CategoriaProducto)0; // Asegurar que haya una categoría válida
+
                 var nuevoProducto = await _productoService.CreateProductoAsync(productoDto);
+
                 return CreatedAtAction(nameof(GetProductoById), new { id = nuevoProducto.Id }, nuevoProducto);
             }
             catch (Exception ex)
@@ -96,6 +93,7 @@ namespace TallerMecanico.Controllers
                 return StatusCode(500, $"Error al crear el producto: {ex.Message}");
             }
         }
+
 
         // Actualizar un producto existente
         [HttpPut("{id}")]

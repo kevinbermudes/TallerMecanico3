@@ -9,7 +9,7 @@ public class Producto
     public decimal Precio { get; set; }
     public int Stock { get; set; }
     public string Imagen { get; set; }
-    public CategoriaProducto Categoria { get; set; } 
+    public CategoriaProducto?  Categoria { get; set; } 
     public ICollection<Carrito> Carritos { get; set; } 
 
 

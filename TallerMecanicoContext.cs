@@ -22,11 +22,14 @@ public class TallerMecanicoContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        // optionsBuilder.UseNpgsql(
+        //     "Host=localhost;Username=kevin;Password=1234;Database=mydatabase")
+        //     .LogTo(Console.WriteLine, LogLevel.Information);
+        // base.OnConfiguring(optionsBuilder);
         optionsBuilder.UseNpgsql(
-            "Host=localhost;Username=kevin;Password=1234;Database=mydatabase")
+                "Host=database-1.cjqi00oume94.eu-north-1.rds.amazonaws.com;Username=kevin;Password=3306kevin;Database=mydatabase")
             .LogTo(Console.WriteLine, LogLevel.Information);
         base.OnConfiguring(optionsBuilder);
-        
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

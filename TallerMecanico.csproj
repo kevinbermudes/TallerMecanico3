@@ -31,4 +31,8 @@
       <Folder Include="AFront\src\app\Service\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="AFront\dist\afront\prerendered-routes.json" />
+    </ItemGroup>
+
 </Project>

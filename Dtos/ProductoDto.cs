@@ -9,7 +9,7 @@ namespace TallerMecanico.Dtos
         public string Descripcion { get; set; }
         public decimal Precio { get; set; }
         public int Stock { get; set; }
-        public CategoriaProducto Categoria { get; set; }
+        public CategoriaProducto?  Categoria { get; set; }
         public string? Imagen { get; set; }
         // Relación con Carrito
       //  public ICollection<CarritoDto>? Carritos { get; set; }

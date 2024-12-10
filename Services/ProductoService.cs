@@ -43,13 +43,18 @@ namespace TallerMecanico.Services
         // Crear un nuevo producto
         public async Task<ProductoDto> CreateProductoAsync(ProductoDto productoDto)
         {
+            // Asignar un valor predeterminado para Categoria si es null
+            productoDto.Categoria ??= (CategoriaProducto)0; // 0 se traduce al primer valor del enum
+
             var producto = _mapper.Map<Producto>(productoDto);
             producto.FechaCreacion = DateTime.UtcNow;
+
             _context.Productos.Add(producto);
             await _context.SaveChangesAsync();
 
             return _mapper.Map<ProductoDto>(producto);
         }
+
 
         // Actualizar un producto existente
         public async Task UpdateProductoAsync(int id, ProductoDto productoDto)
@@ -57,6 +62,7 @@ namespace TallerMecanico.Services
             var producto = await _context.Productos
                 .Include(p => p.Carritos) 
                 .FirstOrDefaultAsync(p => p.Id == id);
+
             if (producto == null)
                 throw new KeyNotFoundException("Producto no encontrado.");
 
@@ -65,12 +71,21 @@ namespace TallerMecanico.Services
             producto.Descripcion = productoDto.Descripcion;
             producto.Precio = productoDto.Precio;
             producto.Stock = productoDto.Stock;
-            producto.Imagen = productoDto.Imagen;
 
-            // No modificar la colección de Carritos aquí
+            // Si no se envía una imagen, usa la imagen existente
+            producto.Imagen = productoDto.Imagen ?? producto.Imagen;
+
+            // Si aún no hay imagen, usa una predeterminada
+            producto.Imagen ??= "https://via.placeholder.com/150";
+
+            // Si la categoría es null, asignar la categoría predeterminada (0 en este caso)
+            producto.Categoria = productoDto.Categoria ?? (CategoriaProducto)0;
 
             await _context.SaveChangesAsync();
         }
+
+
+
 
 
         // Borrado lógico de un producto

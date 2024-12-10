@@ -18,10 +18,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp",
-        policy => policy.WithOrigins("http://localhost:4200")
+        policy => policy
+            .WithOrigins(
+                "http://localhost:4200", 
+                "http://paginawebkevin01.s3-website.eu-north-1.amazonaws.com",
+                "https://staging.d35tdcf6w0xc3x.amplifyapp.com"
+            )
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials());
+});
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5000); 
 });
 
 // Servicios adicionales
@@ -106,9 +116,16 @@ builder.Services.AddAWSService<IAmazonS3>();
 builder.Services.AddScoped<IS3Service, S3Service>();
 
 var app = builder.Build();
-
 // Usar CORS antes de mapear hubs o controladores
 app.UseCors("AllowAngularApp");
+app.UseRouting();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapFallbackToFile("index.html"); 
+});
+
 
 app.UseAuthentication();
 app.UseAuthorization();

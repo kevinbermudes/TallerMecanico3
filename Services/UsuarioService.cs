@@ -167,7 +167,9 @@ namespace TallerMecanico.Services
                     Direccion = registroDto.Direccion,
                     Telefono = registroDto.Telefono,
                     FechaNacimiento = registroDto.FechaNacimiento?.ToUniversalTime(),
-                    FechaCreacion = DateTime.UtcNow
+                    FechaCreacion = DateTime.UtcNow,
+                    PrimerNombre = registroDto.Nombre,
+                    PrimerApellido = registroDto.Apellido
                 };
 
                 _context.Clientes.Add(cliente);

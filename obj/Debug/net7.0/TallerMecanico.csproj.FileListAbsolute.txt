@@ -88,3 +88,15 @@ C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\
 C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Drawing.Common.dll
 C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Windows.Extensions.dll
+C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\publish\web.config
+C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\publish\AFront\angular.json
+C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\publish\AFront\dist\afront\prerendered-routes.json
+C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\publish\AFront\package-lock.json
+C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\publish\AFront\package.json
+C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\publish\AFront\tsconfig.app.json
+C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\publish\AFront\tsconfig.json
+C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\publish\AFront\tsconfig.spec.json
+C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\publish\appsettings.Development.json
+C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\publish\appsettings.json
+C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\publish\TallerMecanico.deps.json
+C:\Users\kevin\Documents\Proyecto Final\TallerMecanico\TallerMecanico\bin\Debug\net7.0\publish\TallerMecanico.runtimeconfig.json
