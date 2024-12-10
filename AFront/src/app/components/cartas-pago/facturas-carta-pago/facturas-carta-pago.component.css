@@ -1,0 +1,50 @@
+/* Estilos para el grupo de botones */
+.button-group {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Ocultar columnas en pantallas menores a 768px */
+@media (max-width: 768px) {
+  .hide-on-mobile {
+    display: none;
+  }
+}
+
+/* Ajustar el tamaño de los botones en móviles */
+@media (max-width: 768px) {
+  .p-button-sm {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .button-group button {
+    width: 100%;
+  }
+}
+
+/* Estilos adicionales para la tabla */
+.facturas-asociadas-table {
+  width: 100%;
+}
+
+/* Opcional: Bordes rojos para campos inválidos */
+input.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched,
+p-dropdown.ng-invalid.ng-touched .p-dropdown-label {
+  border: 1px solid red;
+}
+
+/* Ajustes en el diálogo para móviles */
+@media (max-width: 768px) {
+  p-dialog {
+    width: 95vw !important;
+  }
+}

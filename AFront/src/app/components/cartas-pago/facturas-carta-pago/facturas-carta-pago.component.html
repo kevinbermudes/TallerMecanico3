@@ -1,0 +1,97 @@
+<h2>Facturas Asociadas a la Carta de Pago</h2>
+
+<!-- Botones de acción -->
+<div class="button-group">
+  <button
+    pButton
+    type="button"
+    label="Volver"
+    class="p-button-sm p-button-secondary"
+    (click)="volver()">
+  </button>
+  <button
+    pButton
+    type="button"
+    label="Pagar Todas"
+    class="p-button-success p-button-sm"
+    (click)="pagarTodas()">
+  </button>
+</div>
+
+<div class="contenido">
+  <p-table
+    [value]="facturas"
+    [responsiveLayout]="'scroll'"
+    class="facturas-asociadas-table"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Código</th>
+        <th>Total</th>
+        <th class="hide-on-mobile">Estado</th>
+        <th class="hide-on-mobile">Fecha de Creación</th>
+        <th class="hide-on-mobile">Fecha de Vencimiento</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-factura>
+      <tr>
+        <td>{{ factura.codigoFactura }}</td>
+        <td>{{ factura.total | currency: 'USD' }}</td>
+        <td class="hide-on-mobile">{{ getNombreEstado(factura.estado) }}</td>
+        <td class="hide-on-mobile">{{ factura.fechaCreacion | date: 'short' }}</td>
+        <td class="hide-on-mobile">{{ factura.fechaVencimiento | date: 'short' }}</td>
+        <td>
+          <button
+            pButton
+            label="Detalles"
+            class="p-button-info p-button-sm"
+            style="margin-right: 10px;"
+            (click)="verDetalles(factura)">
+          </button>
+          <button
+            pButton
+            label="Pagar"
+            class="p-button-success p-button-sm"
+            (click)="pagarFactura(factura)">
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Diálogo para mostrar los detalles -->
+<p-dialog
+  [(visible)]="mostrarDialogo"
+  [header]="'Detalles de Factura'"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '90vw', maxWidth: '600px' }">
+  <ng-template pTemplate="content">
+    <p><strong>Código:</strong> {{ facturaSeleccionada?.codigoFactura }}</p>
+    <p><strong>Estado:</strong> {{ getNombreEstado(facturaSeleccionada?.estado ?? null) }}</p>
+    <p><strong>Total:</strong> {{ facturaSeleccionada?.total | currency: 'USD' }}</p>
+    <p><strong>Fecha de Creación:</strong> {{ facturaSeleccionada?.fechaCreacion | date: 'short' }}</p>
+    <p><strong>Fecha de Vencimiento:</strong> {{ facturaSeleccionada?.fechaVencimiento | date: 'short' }}</p>
+    <p><strong>Comentarios:</strong> {{ facturaSeleccionada?.comentarios }}</p>
+
+    <h4>Productos:</h4>
+    <ul>
+      <li *ngFor="let producto of facturaSeleccionada?.productosFactura">
+        {{ producto.nombreProducto }} - {{ producto.cantidad }} x {{ producto.precioUnitario | currency: 'USD' }}
+      </li>
+    </ul>
+
+    <h4>Servicios:</h4>
+    <ul>
+      <li *ngFor="let servicio of facturaSeleccionada?.serviciosFactura">
+        {{ servicio.nombreServicio }} - {{ servicio.precio | currency: 'USD' }}
+      </li>
+    </ul>
+  </ng-template>
+</p-dialog>
+
+<p-toast></p-toast>
+
+

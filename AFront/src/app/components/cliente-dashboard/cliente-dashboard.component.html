@@ -1,17 +1,20 @@
-<div class="cliente-dashboard-container">
-  <!-- Barra de navegación -->
+<div class="cliente-dashboard-container" [ngClass]="{'dark-mode': isDarkMode}">
   <p-menubar [model]="items">
-    <div class="cliente-info">
-      <span style="color:black">Bienvenido, {{ clienteNombre }}</span>
-    </div>
-    <button pButton icon="pi pi-power-off" label="Cerrar sesión" (click)="logout()"></button>
+
+    <ng-template pTemplate="end">
+      <div class="toolbar-right">
+        <div class="switch-container" (click)="toggleDarkMode()">
+          <div class="switch" [class.switch-on]="isDarkMode">
+            <i class="pi" [ngClass]="isDarkMode ? 'pi-sun' : 'pi-moon'"></i>
+            <span>{{ isDarkMode ? 'Claro' : 'Oscuro' }}</span>
+          </div>
+        </div>
+        <button pButton icon="pi pi-power-off" label="Cerrar sesión" (click)="logout()"></button>
+      </div>
+    </ng-template>
   </p-menubar>
 
-  <!-- Área de contenido dinámico -->
   <div class="content">
     <router-outlet></router-outlet>
   </div>
 </div>
-
-
-

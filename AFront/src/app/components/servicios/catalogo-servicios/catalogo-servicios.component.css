@@ -1,0 +1,51 @@
+.contenedor {
+  display: flex;
+  flex-direction: column; /* Apila las cartas verticalmente */
+  gap: 1rem; /* Espacio entre las filas */
+  padding: 1rem; /* Espaciado general */
+}
+
+.servicio {
+  width: 80%; /* Asegura que las cartas ocupen todo el ancho disponible */
+  margin: 0 auto; /* Centra las cartas */
+
+}
+
+.p-card {
+  display: flex;
+  flex-direction: row; /* Hace que el contenido de la carta esté en fila */
+  align-items: center; /* Centra verticalmente el contenido */
+  gap: 1rem; /* Espacio entre la imagen y el contenido */
+  padding: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra ligera */
+  border-radius: 10px; /* Bordes redondeados */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.p-card:hover {
+  transform: translateY(-5px); /* Efecto flotante al pasar el mouse */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.imagen-servicio {
+  flex: 0 0 150px; /* Tamaño fijo para la imagen */
+  height: 200px; /* Altura de la imagen */
+  object-fit: cover; /* Ajusta la imagen sin distorsionarla */
+  border-radius: 8px; /* Bordes redondeados */
+}
+
+.contenido {
+  flex: 1; /* El contenido ocupa el resto del espacio */
+  text-align: left;
+}
+
+.p-card-footer {
+  display: flex;
+  justify-content: flex-end; /* Los botones se alinean a la derecha */
+}
+
+.mensaje-contratado {
+  margin-left: 1rem;
+  color: #ff5722; /* Color destacado */
+  font-weight: bold;
+}

@@ -1,0 +1,25 @@
+<h2 style="text-align: center; margin-bottom: 20px;">Reportes</h2>
+
+<div class="reportes-container">
+  <!-- Gráfica de Estado de Facturas -->
+  <div class="reporte-item">
+    <p-card header="Estado de Facturas" styleClass="reporte-card">
+      <p-chart type="pie" [data]="estadoFacturas" [options]="chartOptions"></p-chart>
+    </p-card>
+  </div>
+  <!-- Gráfica de Ventas por Mes -->
+  <div class="reporte-item">
+    <p-card header="Ventas por Mes" styleClass="reporte-card">
+      <p-chart type="bar" [data]="ventasPorMes" [options]="chartOptions"></p-chart>
+    </p-card>
+  </div>
+
+
+
+  <!-- Gráfica de Clientes con Mayor Facturación -->
+  <div class="reporte-item">
+    <p-card header="Clientes con Mayor Facturación" styleClass="reporte-card">
+      <p-chart type="bar" [data]="clientesFacturacion" [options]="chartOptions"></p-chart>
+    </p-card>
+  </div>
+</div>

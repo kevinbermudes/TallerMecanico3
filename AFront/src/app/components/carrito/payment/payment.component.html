@@ -1,0 +1,31 @@
+<div class="payment-container">
+  <h2>Realizar Pago</h2>
+  <p class="total-amount">Total a pagar: <span>{{ totalAmount | currency: 'USD' }}</span></p>
+
+  <!-- Contenedor del elemento de Stripe -->
+  <div id="card-element" class="stripe-card-element"></div>
+
+  <div class="button-group">
+    <button
+      (click)="pay()"
+      pButton
+      label="Pagar"
+      class="p-button-success"
+      [disabled]="isProcessing"
+    >
+      <ng-container *ngIf="isProcessing">
+        <i class="pi pi-spin pi-spinner" style="margin-right: 0.5rem;"></i>
+      </ng-container>
+    </button>
+    <button
+      (click)="cancel()"
+      pButton
+      label="Cancelar"
+      class="p-button-danger"
+      [disabled]="isProcessing"
+    >
+    </button>
+  </div>
+</div>
+
+<p-toast></p-toast>

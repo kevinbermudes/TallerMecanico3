@@ -30,3 +30,96 @@
   height: 200px;
   object-fit: cover;
 }
+.botones-contenedor {
+  display: flex; /* Alinea los botones horizontalmente */
+  gap: 0.5rem; /* Espacio entre los botones */
+}
+
+/* Si prefieres usar margin */
+.botones-contenedor button {
+  margin-right: 0.5rem; /* Espacio entre botones */
+}
+
+.botones-contenedor button:last-child {
+  margin-right: 0; /* Elimina el margen derecho del último botón */
+}
+
+
+
+
+/* Modo Claro */
+.light-dialog .p-dialog-content {
+  background-color: #ffffff;
+  color: #333; /* Texto oscuro para fondo claro */
+}
+
+.light-dialog .p-dialog-header {
+  background-color: #f5f5f5;
+  color: #333;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+  border-radius: 10px 10px 0 0;
+}
+
+.light-dialog .p-dialog-footer {
+  background-color: #f5f5f5;
+  border-top: 1px solid #ddd;
+}
+
+/* Modo Oscuro */
+.dark-dialog .p-dialog-content {
+  background-color: #1e1e1e;
+  color: #f5f5f5; /* Texto claro para fondo oscuro */
+}
+
+.dark-dialog .p-dialog-header {
+  background-color: #2a2a2a;
+  color: #fff;
+  font-weight: bold;
+  border-bottom: 1px solid #444;
+  border-radius: 10px 10px 0 0;
+}
+
+.dark-dialog .p-dialog-footer {
+  background-color: #2a2a2a;
+  border-top: 1px solid #444;
+}
+
+/* Valores del contenido */
+.dialog-label {
+  font-weight: bold;
+  flex: 0 0 120px;
+  text-align: right;
+  margin-right: 1rem;
+}
+
+.light-dialog .dialog-label {
+  color: #555; /* Gris oscuro para modo claro */
+}
+
+.dark-dialog .dialog-label {
+  color: #bbbbbb; /* Gris claro para modo oscuro */
+}
+
+.light-dialog .dialog-value {
+  color: #333; /* Texto oscuro para modo claro */
+}
+
+.dark-dialog .dialog-value {
+  color: #ffffff; /* Texto claro para modo oscuro */
+}
+/* Contenedor de la imagen centrada */
+.imagen-contenedor {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px; /* Espacio entre la imagen y los demás campos */
+}
+
+.vista-previa-imagen {
+  max-width: 100%; /* Escalar la imagen al ancho disponible */
+  max-height: 300px; /* Altura máxima para mantener proporciones */
+  object-fit: cover; /* Ajustar la imagen sin distorsión */
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+}

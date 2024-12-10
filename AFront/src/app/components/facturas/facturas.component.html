@@ -1,1 +1,157 @@
-estas en facturas
+<h2>Mis Facturas</h2>
+
+<!-- Barra de búsqueda global -->
+<div class="search-bar">
+  <input
+    pInputText
+    type="text"
+    [(ngModel)]="searchValue"
+    (input)="dt?.filterGlobal(searchValue, 'contains')"
+    placeholder="Buscar por Código de factura "
+    class="search-input"
+  />
+</div>
+
+<div class="contenido">
+  <p-table
+    #dt
+    [value]="facturas"
+    [responsiveLayout]="'scroll'"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[5,10,20]"
+    [globalFilterFields]="['codigoFactura']"
+    class="facturas-table"
+  >
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Código</th>
+        <th>Total</th>
+        <th class="hide-on-mobile">Estado</th>
+        <th class="hide-on-mobile">Fecha de Creación</th>
+        <th class="hide-on-mobile">Fecha de Vencimiento</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-factura>
+      <tr>
+        <td>{{ factura.codigoFactura }}</td>
+        <td>{{ factura.total | currency:'USD' }}</td>
+        <td class="hide-on-mobile">{{ EstadoFactura[factura.estado] }}</td>
+        <td class="hide-on-mobile">{{ factura.fechaCreacion | date:'short' }}</td>
+        <td class="hide-on-mobile">{{ factura.fechaVencimiento | date:'short' }}</td>
+        <td>
+          <button
+            pButton
+            type="button"
+            label="Detalles"
+            class="p-button-info"
+            (click)="verDetalles(factura)">
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Diálogo de detalles -->
+<p-dialog
+  header="Detalles de Factura"
+  [(visible)]="mostrarDialogo"
+  [style]="{ width: '90vw', maxWidth: '600px' }"
+  modal="true"
+  [closable]="true">
+  <div *ngIf="facturaSeleccionada">
+    <!-- Comentarios -->
+    <h3>Comentario</h3>
+    <p>{{ facturaSeleccionada.comentarios || 'No hay comentario' }}</p>
+
+    <!-- Productos -->
+    <div *ngIf="facturaSeleccionada.productosFactura?.length">
+      <h3>Productos</h3>
+      <ul>
+        <li *ngFor="let producto of facturaSeleccionada.productosFactura">
+          {{ producto.nombreProducto }} - {{ producto.cantidad }} x {{ producto.precioUnitario | currency:'USD' }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Servicios -->
+    <div *ngIf="facturaSeleccionada.serviciosFactura?.length">
+      <h3>Servicios</h3>
+      <ul>
+        <li *ngFor="let servicio of facturaSeleccionada.serviciosFactura">
+          {{ servicio.nombreServicio }} - {{ servicio.precio | currency:'USD' }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</p-dialog>
+
+<p-toast></p-toast>
+
+<!-- Estilos para hacer la tabla responsiva -->
+<style>
+  /* Ocultar columnas en pantallas menores a 768px */
+  @media (max-width: 768px) {
+    .hide-on-mobile {
+      display: none;
+    }
+  }
+
+  /* Mejorar el diseño de la barra de búsqueda en móviles */
+  @media (max-width: 768px) {
+    .contenido {
+      padding: 0.5rem;
+    }
+
+    .facturas-table {
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Opcional: Ajustar el tamaño del botón en móviles */
+  @media (max-width: 768px) {
+    .p-button-info {
+      font-size: 0.8rem;
+      padding: 0.4rem 0.6rem;
+    }
+  }
+
+  /* Estilos adicionales para la tabla */
+  .facturas-table {
+    width: 100%;
+  }
+
+  /* Estilos para la barra de búsqueda */
+  .search-bar {
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .search-input {
+    flex: 1;
+    margin-right: 10px;
+    font-size: 1.2rem;
+    padding: 0.5rem;
+  }
+
+  /* Ajustes para móviles */
+  @media (max-width: 768px) {
+    .search-input {
+      font-size: 1rem;
+      padding: 0.4rem;
+    }
+  }
+
+  /* Opcional: Bordes rojos para campos inválidos */
+  input.ng-invalid.ng-touched,
+  textarea.ng-invalid.ng-touched,
+  p-dropdown.ng-invalid.ng-touched .p-dropdown-label {
+    border: 1px solid red;
+  }
+</style>

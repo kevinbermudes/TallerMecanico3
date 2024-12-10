@@ -27,6 +27,7 @@ export class ClienteDashboardComponent implements OnInit {
   clienteId: number | null = null;
   tieneNotificacionesCarrito: boolean = false;
   items: MenuItem[] = [];
+  isDarkMode: boolean = false;
 
   constructor(
     private signalRService: SignalRService,
@@ -95,14 +96,17 @@ export class ClienteDashboardComponent implements OnInit {
         ]
       },
       {
-        label: 'Vehículos',
-        icon: 'pi pi-car',
+        label: 'Motocicletas',
+        icon: 'fa fa-motorcycle',
         command: () => this.navigateTo('/cliente/vehiculos')
       },
       {
         label: 'Servicios',
         icon: 'pi pi-briefcase',
-        command: () => this.navigateTo('/cliente/servicios')
+        items: [
+          { label: 'Mis Servicios', icon: 'pi pi-briefcase', command: () => this.navigateTo('/cliente/servicios') },
+          { label: 'Catálogo de Servicios', icon: 'pi pi-list', command: () => this.navigateTo('/cliente/catalogo-servicios') }
+        ]
       },
       {
         label: 'Carrito',
@@ -116,6 +120,7 @@ export class ClienteDashboardComponent implements OnInit {
       }
     ];
   }
+
 
   irAlCarrito() {
     if (this.clienteId) {
@@ -152,4 +157,15 @@ export class ClienteDashboardComponent implements OnInit {
   navigateTo(route: string) {
     this.router.navigate([route]);
   }
+  toggleDarkMode() {
+    this.isDarkMode = !this.isDarkMode;
+
+    if (this.isDarkMode) {
+      document.documentElement.classList.add('dark-mode');
+    } else {
+      document.documentElement.classList.remove('dark-mode');
+    }
+  }
+
+
 }

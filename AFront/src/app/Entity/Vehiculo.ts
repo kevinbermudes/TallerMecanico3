@@ -8,7 +8,7 @@ export interface Vehiculo {
   marca: string;
   modelo: string;
   //posible problema ojo
-  año: number;
+  year: number;
   placa: string;
   serviciosRealizados: Servicio[];
   fechaCreacion: Date;

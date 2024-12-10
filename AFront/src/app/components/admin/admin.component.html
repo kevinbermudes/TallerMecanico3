@@ -1,1 +1,22 @@
-hola este es el compoente de admin
+<div class="dashboard-container" [ngClass]="{ 'dark-mode': isDarkMode }">
+  <!-- Barra lateral -->
+  <div class="sidebar">
+    <p-menubar [model]="items"></p-menubar>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="content">
+    <!-- Botón para alternar entre modo oscuro y claro -->
+    <div class="mode-toggle-container">
+      <button
+        pButton
+        type="button"
+        [label]="isDarkMode ? 'Modo Claro' : 'Modo Oscuro'"
+        [icon]="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"
+        class="p-button-text"
+        (click)="toggleDarkMode()">
+      </button>
+    </div>
+    <router-outlet></router-outlet>
+  </div>
+</div>

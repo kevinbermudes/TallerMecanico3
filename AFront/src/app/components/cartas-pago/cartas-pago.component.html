@@ -1,1 +1,32 @@
-estas en cartas de pago
+<h2>Mis Cartas de Pago</h2>
+
+<div class="contenido">
+  <p-table [value]="cartasPago" [responsiveLayout]="'scroll'">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>ID</th>
+        <th>Monto Total</th>
+        <th>Fecha de Pago</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-cartaPago>
+      <tr>
+        <td>{{ cartaPago.id }}</td>
+        <td>{{ cartaPago.monto | currency: 'USD' }}</td> <!-- Mostrar el monto total -->
+        <td>{{ cartaPago.fechaPago | date: 'short' }}</td>
+        <td>
+          <button
+            pButton
+            type="button"
+            label="Ver Facturas"
+            class="p-button-sm"
+            (click)="verFacturas(cartaPago.id)">
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast></p-toast>

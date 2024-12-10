@@ -3,63 +3,138 @@
 
   <form [formGroup]="clienteForm" (ngSubmit)="actualizarCliente()">
     <div class="form-grid">
+      <!-- Primer Nombre -->
       <div class="form-item">
         <label for="primerNombre">Primer Nombre:</label>
         <input id="primerNombre" pInputText formControlName="primerNombre" />
+        <div *ngIf="clienteForm.get('primerNombre')?.invalid && clienteForm.get('primerNombre')?.touched" class="error">
+          <span *ngIf="clienteForm.get('primerNombre')?.errors?.['minlength']">
+            Primer Nombre debe tener al menos 3 caracteres.
+          </span>
+        </div>
       </div>
+
+      <!-- Segundo Nombre -->
       <div class="form-item">
         <label for="segundoNombre">Segundo Nombre:</label>
         <input id="segundoNombre" pInputText formControlName="segundoNombre" />
+        <div *ngIf="clienteForm.get('segundoNombre')?.invalid && clienteForm.get('segundoNombre')?.touched" class="error">
+          <span *ngIf="clienteForm.get('segundoNombre')?.errors?.['minlength']">
+            Segundo Nombre debe tener al menos 3 caracteres.
+          </span>
+        </div>
       </div>
+
+      <!-- Primer Apellido -->
       <div class="form-item">
         <label for="primerApellido">Primer Apellido:</label>
         <input id="primerApellido" pInputText formControlName="primerApellido" />
+        <div *ngIf="clienteForm.get('primerApellido')?.invalid && clienteForm.get('primerApellido')?.touched" class="error">
+          <span *ngIf="clienteForm.get('primerApellido')?.errors?.['minlength']">
+            Primer Apellido debe tener al menos 3 caracteres.
+          </span>
+        </div>
       </div>
+
+      <!-- Segundo Apellido -->
       <div class="form-item">
         <label for="segundoApellido">Segundo Apellido:</label>
         <input id="segundoApellido" pInputText formControlName="segundoApellido" />
+        <div *ngIf="clienteForm.get('segundoApellido')?.invalid && clienteForm.get('segundoApellido')?.touched" class="error">
+          <span *ngIf="clienteForm.get('segundoApellido')?.errors?.['minlength']">
+            Segundo Apellido debe tener al menos 3 caracteres.
+          </span>
+        </div>
       </div>
+
+      <!-- Dirección -->
       <div class="form-item">
         <label for="direccion">Dirección:</label>
         <input id="direccion" pInputText formControlName="direccion" />
+        <div *ngIf="clienteForm.get('direccion')?.invalid && clienteForm.get('direccion')?.touched" class="error">
+          <span *ngIf="clienteForm.get('direccion')?.errors?.['minlength']">
+            Dirección debe tener al menos 3 caracteres.
+          </span>
+        </div>
       </div>
+
+      <!-- Teléfono -->
       <div class="form-item">
         <label for="telefono">Teléfono:</label>
         <input id="telefono" pInputText formControlName="telefono" />
+        <div *ngIf="clienteForm.get('telefono')?.invalid && clienteForm.get('telefono')?.touched" class="error">
+          <span *ngIf="clienteForm.get('telefono')?.errors?.['required']">
+            Teléfono es requerido.
+          </span>
+          <span *ngIf="clienteForm.get('telefono')?.errors?.['pattern']">
+            Teléfono debe tener entre 8 y 10 dígitos numéricos.
+          </span>
+        </div>
       </div>
+
+      <!-- Email Secundario -->
       <div class="form-item">
         <label for="emailSecundario">Email Secundario:</label>
         <input id="emailSecundario" pInputText formControlName="emailSecundario" />
+        <div *ngIf="clienteForm.get('emailSecundario')?.invalid && clienteForm.get('emailSecundario')?.touched" class="error">
+          <span *ngIf="clienteForm.get('emailSecundario')?.errors?.['email']">
+            Email Secundario debe ser válido.
+          </span>
+        </div>
       </div>
+
+      <!-- DNI -->
       <div class="form-item">
         <label for="dni">DNI:</label>
         <input id="dni" pInputText formControlName="dni" />
       </div>
+
+      <!-- Fecha de Nacimiento -->
       <div class="form-item">
         <label for="fechaNacimiento">Fecha de Nacimiento:</label>
         <input id="fechaNacimiento" type="date" pInputText formControlName="fechaNacimiento" />
       </div>
+
+      <!-- Género -->
       <div class="form-item">
         <label for="genero">Género:</label>
         <p-dropdown
           [options]="generos"
-          formControlName="genero">
+          formControlName="genero"
+          placeholder="Seleccione Género">
         </p-dropdown>
       </div>
+
+      <!-- Estado Civil -->
       <div class="form-item">
         <label for="estadoCivil">Estado Civil:</label>
         <p-dropdown
           [options]="estadosCiviles"
-          formControlName="estadoCivil">
+          formControlName="estadoCivil"
+          placeholder="Seleccione Estado Civil">
         </p-dropdown>
       </div>
+
+      <!-- Ocupación -->
       <div class="form-item">
         <label for="ocupacion">Ocupación:</label>
         <input id="ocupacion" pInputText formControlName="ocupacion" />
+        <div *ngIf="clienteForm.get('ocupacion')?.invalid && clienteForm.get('ocupacion')?.touched" class="error">
+          <span *ngIf="clienteForm.get('ocupacion')?.errors?.['minlength']">
+            Ocupación debe tener al menos 3 caracteres.
+          </span>
+        </div>
       </div>
+
+      <!-- Notas -->
       <div class="form-item">
         <label for="notas">Notas:</label>
-        <textarea id="notas" formControlName="notas"></textarea>
+        <textarea pInputTextarea id="notas" formControlName="notas"></textarea>
+        <div *ngIf="clienteForm.get('notas')?.invalid && clienteForm.get('notas')?.touched" class="error">
+          <span *ngIf="clienteForm.get('notas')?.errors?.['minlength']">
+            Notas debe tener al menos 3 caracteres.
+          </span>
+        </div>
       </div>
     </div>
     <div class="form-footer">
@@ -67,9 +142,42 @@
         pButton
         type="submit"
         label="Actualizar"
-        [disabled]="!isFormChanged"
+        [disabled]="!clienteForm.dirty || clienteForm.invalid"
         class="p-button-success"
       ></button>
     </div>
   </form>
 </div>
+<p-toast></p-toast>
+
+<!-- Estilos para mensajes de error -->
+<style>
+  .error {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 4px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+  }
+
+  .form-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-footer {
+    margin-top: 20px;
+    text-align: right;
+  }
+
+  /* Opcional: Bordes rojos para campos inválidos */
+  input.ng-invalid.ng-touched,
+  textarea.ng-invalid.ng-touched,
+  p-dropdown.ng-invalid.ng-touched .p-dropdown-label {
+    border: 1px solid red;
+  }
+</style>

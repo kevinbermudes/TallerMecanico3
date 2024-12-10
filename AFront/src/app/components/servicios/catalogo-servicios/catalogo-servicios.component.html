@@ -1,0 +1,28 @@
+<h2 class="servicio">Catálogo de Servicios</h2>
+
+<div class="contenedor">
+  <div *ngFor="let servicio of servicios" class="servicio">
+    <p-card header="{{ servicio.nombre }}" subheader="{{ servicio.descripcion }}">
+      <ng-template pTemplate="header">
+        <img [src]="getImagenUrl(servicio)" alt="Imagen de Servicio" class="imagen-servicio" />
+      </ng-template>
+      <div class="contenido">
+        <p><strong>Precio:</strong> {{ servicio.precio | currency:'USD' }}</p>
+      </div>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          type="button"
+          label="Añadir al Carrito"
+          class="p-button-success"
+          [disabled]="serviciosContratados.includes(servicio.id)"
+          (click)="contratarServicio(servicio.id)">
+        </button>
+        <p *ngIf="serviciosContratados.includes(servicio.id)" class="mensaje-contratado">
+          Servicio ya contratado
+        </p>
+      </ng-template>
+    </p-card>
+  </div>
+</div>
+<p-toast></p-toast>

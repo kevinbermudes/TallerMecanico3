@@ -1,1 +1,168 @@
 /* You can add global styles to this file, and also import other style files */
+/* Modo Claro (por defecto) */
+body {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+/* Modo Oscuro */
+.dark-mode {
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+.dark-mode table {
+  background-color: #2a2a2a;
+  color: #fff;
+}
+
+.dark-mode .card {
+  background-color: #2a2a2a;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+/* Ajusta aquí todos los selectores globales que necesites para tablas, títulos, etc. */
+.dark-mode .p-datatable {
+  background-color: #2a2a2a !important;
+  color: #fff !important;
+}
+
+.dark-mode .p-datatable tbody > tr > td {
+  border-color: #444 !important;
+}
+
+.dark-mode .p-card {
+  background-color: #333 !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+:host ::ng-deep .dark-mode .p-datatable {
+  background-color: #2a2a2a;
+}
+/* Modo Oscuro Global */
+.dark-mode {
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+/* Estilos para p-table */
+.dark-mode .p-datatable {
+  background-color: #2a2a2a !important;
+  color: #fff !important;
+}
+
+.dark-mode .p-datatable .p-datatable-thead > tr > th {
+  background-color: #333 !important;
+  color: #fff !important;
+}
+
+.dark-mode .p-datatable .p-datatable-tbody > tr > td {
+  background-color: #2a2a2a !important;
+  color: #fff !important;
+  border-color: #444 !important;
+}
+
+/* Estilos para p-dialog */
+.dark-mode .p-dialog .p-dialog-header {
+  background-color: #2a2a2a !important;
+  color: #fff !important;
+  border-bottom: 1px solid #444 !important;
+}
+
+.dark-mode .p-dialog .p-dialog-content {
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+}
+.dark-mode .resumen-pago-horizontal {
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+}
+
+.dark-mode .resumen-pago-horizontal .detalle {
+  color: #fff !important;
+}
+
+.dark-mode .resumen-pago-horizontal .p-button-success {
+  background-color: #4caf50 !important;
+  border-color: #4caf50 !important;
+  color: #fff !important;
+}
+.dark-mode .p-menubar {
+  background-color: #2a2a2a !important;
+  border: none !important;
+}
+
+.dark-mode .p-menubar .p-menubar-root-list > li > a {
+  color: #fff !important;
+}
+
+.dark-mode .p-menubar .p-menubar-root-list > li > a:hover {
+  background-color: #333 !important;
+}
+.dark-mode .p-menubar .p-menubar-root-list > li > a {
+  color: #fff !important;
+}
+
+.dark-mode .cliente-info span {
+  color: #fff !important;
+}
+
+.dark-mode {
+  color: #fff !important;
+}
+
+
+
+.switch-container {
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+}
+
+.switch {
+  display: flex;
+  align-items: center;
+  background-color: #ccc;
+  border-radius: 30px;
+  padding: 5px 10px;
+  transition: background-color 0.3s ease;
+}
+
+.switch i {
+  margin-right: 8px;
+}
+
+.switch-on {
+  background-color: #2a2a2a; /* color modo oscuro */
+  color: #fff; /* texto blanco */
+}
+
+.switch-on i {
+  color: #FFD700; /* color icono sol */
+}
+.dark-mode .p-paginator {
+  background-color: #2a2a2a !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+/* Estilos para los botones de paginación */
+.dark-mode .p-paginator .p-paginator-pages a {
+  color: #fff !important;
+}
+
+/* Estilos para el dropdown de filas por página */
+.dark-mode .p-paginator .p-dropdown .p-inputtext {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: none !important;
+}
+
+/* Si la paginación tiene flechas (primeicons), asegurarse que tomen color */
+.dark-mode .p-paginator .p-paginator-icon {
+  color: #fff !important;
+}
+
+
+

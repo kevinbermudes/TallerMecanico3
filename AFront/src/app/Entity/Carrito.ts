@@ -1,11 +1,18 @@
 ﻿export interface Carrito {
   id: number;
   clienteId: number;
-  productoId: number;
+  producto?: {
+    id: number;
+    nombre: string;
+    imagen: string;
+    precio: number;
+  };
+  servicio?: {
+    id: number;
+    nombre: string;
+    precio: number;
+  };
   cantidad: number;
   precioTotal: number;
-  fechaCreacion: string;
-  fechaActualizacion: string | null;
-  fechaBorrado: string | null;
   estaBorrado: boolean;
 }

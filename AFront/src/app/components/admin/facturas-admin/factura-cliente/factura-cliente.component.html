@@ -1,0 +1,191 @@
+<h2>Facturas del Cliente</h2>
+<button pButton label="Crear Factura" icon="pi pi-plus" class="p-button-success crearFactura" (click)="mostrarDialogoCrearFactura()"></button>
+<p>Total de facturas pendientes: <strong class="NumeroFacturasPendientes">{{ facturasPendientes }}</strong></p>
+<div style="display: flex; align-items: center; margin-bottom: 10px;">
+  <input
+    pInputText
+    type="text"
+    [(ngModel)]="searchValue"
+    (input)="dt?.filterGlobal(searchValue, 'contains')"
+    placeholder="Buscar por nombre de factura..."
+    style="flex: 1; margin-right: 10px;"
+  />
+  <button
+    pButton
+    type="button"
+    label="Limpiar"
+    icon="pi pi-filter-slash"
+    class="p-button-outlined"
+    (click)="clear(dt)"
+  ></button>
+</div>
+
+<p-table #dt
+         [value]="facturas"
+         [responsiveLayout]="'scroll'"
+         [scrollable]="true"
+         [paginator]="true"
+         [rows]="10"
+         [rowsPerPageOptions]="[5, 10, 20]"
+         [showCurrentPageReport]="true"
+         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} facturas"
+         [globalFilterFields]="['codigoFactura', 'estado', 'total']"
+         [style]="{ 'margin-top': '20px' }">
+  <ng-template pTemplate="header">
+    <tr>
+      <th pSortableColumn="codigoFactura">Código
+        <p-sortIcon field="codigoFactura"></p-sortIcon>
+      </th>
+      <th>Fecha
+        <p-columnFilter field="fechaCreacion" type="date" [showMenu]="false">
+          <ng-template pTemplate="filter" let-filter>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <p-calendar
+                [(ngModel)]="filtroFecha"
+                (onSelect)="aplicarFiltroFecha()"
+                dateFormat="yy-mm-dd"
+                placeholder="Selecciona fecha"
+                [style]="{ width: '150px' }"
+                appendTo="body">
+              </p-calendar>
+              <button
+                pButton
+                icon="pi pi-times"
+                class="p-button-outlined small-width-button"
+                label="Limpiar"
+                (click)="clearFiltroFecha()">
+              </button>
+            </div>
+          </ng-template>
+        </p-columnFilter>
+      </th>
+
+
+
+      <th pSortableColumn="total">Total
+        <p-sortIcon field="total"></p-sortIcon>
+
+      </th>
+
+      <th pSortableColumn="estado">Estado
+        <p-sortIcon field="estado"></p-sortIcon>
+        <p-columnFilter field="estado" type="text" [showMenu]="false">
+          <ng-template pTemplate="filter" let-filter>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <p-dropdown
+                [options]="[
+            { label: 'Pendiente', value: 1 },
+            { label: 'Pagada', value: 0 }
+          ]"
+                [(ngModel)]="filtroEstado"
+                placeholder="Selecciona estado"
+                [style]="{ width: '150px' }"
+                (onChange)="aplicarFiltroEstado()">
+              </p-dropdown>
+              <button
+                pButton
+                icon="pi pi-times"
+                class="p-button-outlined small-width-button"
+                label="Limpiar"
+                (click)="clearFiltroEstado()">
+              </button>
+            </div>
+          </ng-template>
+        </p-columnFilter>
+      </th>
+
+      <th>Acciones</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-factura>
+    <tr [ngClass]="{ 'estado-pendiente': factura.estado === 1 }">
+      <td>{{ factura.codigoFactura }}</td>
+      <td>{{ factura.fechaCreacion | date }}</td>
+      <td>{{ factura.total | currency:'USD' }}</td>
+      <td>{{ getEstadoNombre(factura.estado) }}</td>
+      <td>
+        <button pButton icon="pi pi-info-circle" label="Detalles" class="p-button-info"
+                (click)="verDetallesFactura(factura)">
+        </button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<p *ngIf="facturas.length === 0" class="mensaje-sin-facturas">El cliente no tiene facturas que coincidan con los filtros.</p>
+
+<p-dialog
+  [(visible)]="mostrarDialogo"
+  header="Crear Nueva Factura"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '50vw', 'border-radius': '10px', 'box-shadow': '0px 4px 6px rgba(0, 0, 0, 0.1)' }">
+  <div style="padding: 1rem;">
+    <div class="form-group" style="margin-bottom: 1.5rem; display: flex; flex-direction: column;">
+      <label for="total" style="font-weight: bold; margin-bottom: 0.5rem; color: #333;">Total:</label>
+      <input
+        pInputText
+        type="number"
+        [(ngModel)]="nuevaFactura.total"
+        id="total"
+        placeholder="Ingresa el total"
+        style="padding: 0.5rem; font-size: 1rem; border: 1px solid #d9d9d9; border-radius: 5px; box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);" />
+    </div>
+    <div class="form-group" style="margin-bottom: 1.5rem; display: flex; flex-direction: column;">
+      <label for="estado" style="font-weight: bold; margin-bottom: 0.5rem; color: #333;">Estado:</label>
+      <p-dropdown
+        [options]="estadosFactura"
+        [(ngModel)]="nuevaFactura.estado"
+        placeholder="Selecciona un estado"
+        ></p-dropdown>
+    </div>
+    <div class="form-group" style="margin-bottom: 1.5rem; display: flex; flex-direction: column;">
+      <label for="comentarios" style="font-weight: bold; margin-bottom: 0.5rem; color: #333;">Comentarios:</label>
+      <textarea
+        pInputTextarea
+        [(ngModel)]="nuevaFactura.comentarios"
+        id="comentarios"
+        rows="4"
+        placeholder="Ingresa comentarios sobre la factura"
+        style="resize: none; padding: 0.5rem; font-size: 1rem; border: 1px solid #d9d9d9; border-radius: 5px; box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);"></textarea>
+    </div>
+
+    <div class="acciones-dialogo" style="display: flex; justify-content: space-between; margin-top: 1rem;">
+      <button
+        pButton
+        label="Guardar"
+        class="p-button-success"
+        style="width: 48%; font-size: 1rem;"
+        (click)="crearFactura()"></button>
+      <button
+        pButton
+        label="Cancelar"
+        class="p-button-secondary"
+        style="width: 48%; font-size: 1rem;"
+        (click)="cerrarDialogoCrearFactura()"></button>
+    </div>
+  </div>
+</p-dialog>
+
+
+
+<p-dialog
+  [(visible)]="mostrarDetalles"
+  header="Detalles de la Factura"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '50vw' }"
+  [styleClass]="'detalles-factura-dialog'">
+  <div *ngIf="facturaSeleccionada" class="contenido-dialogo">
+    <p><strong>Código:</strong> {{ facturaSeleccionada.codigoFactura }}</p>
+    <p><strong>Fecha de Creación:</strong> {{ facturaSeleccionada.fechaCreacion | date }}</p>
+    <p><strong>Fecha de Vencimiento:</strong> {{ facturaSeleccionada.fechaVencimiento | date }}</p>
+    <p><strong>Total:</strong> {{ facturaSeleccionada.total | currency:'USD' }}</p>
+    <p><strong>Comentario:</strong> {{ facturaSeleccionada.comentarios || 'Sin comentarios' }}</p>
+  </div>
+  <div class="acciones-dialogo">
+    <button pButton label="Cerrar" class="p-button-secondary" (click)="mostrarDetalles = false"></button>
+  </div>
+</p-dialog>
+
+<p-toast></p-toast>

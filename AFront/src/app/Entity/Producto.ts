@@ -7,8 +7,8 @@ export interface Producto {
   id: number;
   nombre: string;
   descripcion: string;
-  precio: number;
-  stock: number;
+  precio: number|null;
+  stock: number | null;
   categoria: number;
   fechaCreacion: string;
   fechaActualizacion: string | null;

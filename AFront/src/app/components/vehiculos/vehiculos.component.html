@@ -1,1 +1,66 @@
-estas en vehiculos
+<h2>Gestión de Vehículos</h2>
+
+<div class="acciones">
+  <button pButton label="Añadir Vehículo" icon="pi pi-plus" (click)="mostrarDialogoNuevoVehiculo()" class="p-button-success"></button>
+</div>
+
+<h3>Lista de Vehículos</h3>
+<p-table [value]="vehiculos" [responsiveLayout]="'scroll'" [scrollable]="true" scrollHeight="60vh">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Marca</th>
+      <th>Modelo</th>
+      <th>Año</th>
+      <th>Placa</th>
+      <th>Acciones</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-vehiculo>
+    <tr>
+      <td>{{ vehiculo.marca }}</td>
+      <td>{{ vehiculo.modelo }}</td>
+      <td>{{ vehiculo.year }}</td>
+      <td>{{ vehiculo.placa }}</td>
+      <td>
+        <button
+          pButton
+          icon="pi pi-trash"
+          label="Eliminar"
+          class="p-button-danger"
+          (click)="eliminarVehiculo(vehiculo.id)"
+        ></button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<!-- Diálogo para añadir nuevo vehículo -->
+<p-dialog [(visible)]="mostrarDialogo" header="Añadir Nuevo Vehículo" [modal]="true" [closable]="true" [style]="{ width: '30vw' }">
+  <div class="form-container">
+    <div class="form-group">
+      <label for="marca">Marca</label>
+      <input type="text" pInputText [(ngModel)]="nuevoVehiculo.marca" placeholder="Marca" inputId="marca">
+    </div>
+    <div class="form-group">
+      <label for="modelo">Modelo</label>
+      <input type="text" pInputText [(ngModel)]="nuevoVehiculo.modelo" placeholder="Modelo" inputId="modelo">
+    </div>
+    <div class="form-group">
+      <label for="year">Año</label>
+      <p-inputNumber [(ngModel)]="nuevoVehiculo.year" placeholder="Año" inputId="year" [min]="1900" [max]="currentYear"></p-inputNumber>
+    </div>
+    <div class="form-group">
+      <label for="placa">Placa</label>
+      <input type="text" pInputText [(ngModel)]="nuevoVehiculo.placa" placeholder="Placa" inputId="placa">
+    </div>
+    <div class="acciones-dialogo">
+      <button pButton label="Guardar" (click)="agregarVehiculo()" class="p-button-success"></button>
+      <button pButton label="Cancelar" (click)="mostrarDialogo = false" class="p-button-secondary"></button>
+    </div>
+  </div>
+</p-dialog>
+
+
+
+
+<p-toast></p-toast>

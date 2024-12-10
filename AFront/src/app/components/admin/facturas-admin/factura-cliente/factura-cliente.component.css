@@ -1,0 +1,115 @@
+.crearFactura {
+    margin-bottom: 20px;
+}
+.mensaje-sin-facturas {
+  color: #ff0000;
+  font-style: italic;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.NumeroFacturasPendientes {
+ color: #ff0000;
+}
+.estado-pendiente {
+  background-color: #ffe6e6; /* Fondo rojo claro */
+  color: #ff0000; /* Texto rojo */
+}
+.ui-calendar {
+  width: 150px !important;
+  display: inline-block; /* Evita que se expanda innecesariamente */
+
+}
+
+.ui-calendar .ui-inputtext {
+  font-size: 14px;
+}
+.ui-table-scrollable-header {
+  overflow: hidden !important; /* Elimina el scroll del encabezado */
+}
+.ui-datepicker {
+  z-index: 1050 !important; /* Asegura que el calendario esté encima de otros elementos */
+}
+
+.p-calendar {
+  position: relative; /* Controla la posición del calendario */
+}
+
+.ui-overlay {
+  z-index: 1050 !important; /* Aplica un índice de apilamiento alto */
+}
+.p-datatable-scrollable-header {
+  overflow: hidden !important; /* Elimina cualquier scroll visible en el encabezado */
+}
+
+.p-datatable-scrollable-body {
+  overflow-x: auto !important;
+}
+.small-width-button {
+  width: 110px; /* Establece un ancho más pequeño */
+  text-align: center; /* Centra el contenido dentro del botón */
+}
+
+/* Estilos generales para el diálogo */
+.detalles-factura-dialog .p-dialog-content {
+  padding: 1.5rem;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  border-radius: 10px;
+}
+
+.detalles-factura-dialog .p-dialog-header {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  padding: 1rem;
+}
+
+.detalles-factura-dialog .contenido-dialogo {
+  padding: 1rem;
+  font-size: 1.1rem;
+}
+
+/* Botones en la parte inferior */
+.acciones-dialogo {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1rem;
+}
+
+.acciones-dialogo button {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+/* Estilos para modo oscuro */
+.dark-mode .detalles-factura-dialog .p-dialog-content {
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #444444;
+}
+
+.dark-mode .detalles-factura-dialog .p-dialog-header {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+.dark-mode .detalles-factura-dialog .contenido-dialogo p {
+  color: #dddddd;
+}
+
+/* Estilos para modo claro */
+.light-mode .detalles-factura-dialog .p-dialog-content {
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #dddddd;
+}
+
+.light-mode .detalles-factura-dialog .p-dialog-header {
+  background-color: #f5f5f5;
+  color: #333333;
+}
+
+.light-mode .detalles-factura-dialog .contenido-dialogo p {
+  color: #666666;
+}

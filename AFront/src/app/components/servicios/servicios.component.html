@@ -1,1 +1,44 @@
-estas en servicios
+<h2>Mis Servicios Contratados</h2>
+
+<div class="contenedor">
+  <div *ngIf="serviciosContratados.length > 0; else noData" class="servicios">
+    <div *ngFor="let servicio of serviciosContratados" class="servicio">
+      <p-card header="{{ servicio.nombre }}" subheader="{{ servicio.descripcion }}">
+        <ng-template pTemplate="header">
+          <img [src]="getImagenUrl(servicio)" alt="Imagen de Servicio" class="imagen-servicio" />
+        </ng-template>
+        <div class="contenido">
+          <p><strong>Precio:</strong> {{ servicio.precio | currency:'USD' }}</p>
+        </div>
+        <!-- Agregar el template de footer -->
+        <ng-template pTemplate="footer">
+          <button
+            pButton
+            type="button"
+            label="Quitar Servicio"
+            class="p-button-danger"
+            (click)="quitarServicio(servicio.id)"
+          ></button>
+        </ng-template>
+      </p-card>
+    </div>
+  </div>
+
+  <ng-template #noData>
+    <div class="no-data">
+      <p>No tienes servicios contratados, ¿Quieres contratar algún servicio?.</p>
+
+      <button
+        pButton
+        type="button"
+        label="Ir a catálogo de servicios"
+        class="p-button-success"
+        (click)="irACatalogo()"
+      ></button>
+    </div>
+  </ng-template> <ng-template #noData>
+    <p>No tienes servicios contratados.</p>
+  </ng-template>
+</div>
+<p-toast></p-toast>
+

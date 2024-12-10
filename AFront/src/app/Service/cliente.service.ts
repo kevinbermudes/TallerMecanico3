@@ -8,12 +8,14 @@ import { Notificacion } from '../Entity/Notificacion';
 import { Pago } from '../Entity/Pago';
 import { Servicio } from '../Entity/Servicio';
 import { Vehiculo } from '../Entity/Vehiculo';
+import {environment} from '../../env/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClienteService {
-  private apiUrl = 'http://localhost:5132/api/Cliente';
+  // private apiUrl = 'http://localhost:5132/api/Cliente';
+  private apiUrl = `${environment.apiUrl}Cliente`;
 
   constructor(private http: HttpClient) {}
 
@@ -71,4 +73,8 @@ export class ClienteService {
   getVehiculosByClienteId(id: number): Observable<Vehiculo[]> {
     return this.http.get<Vehiculo[]>(`${this.apiUrl}/${id}/vehiculos`);
   }
+  reactivarCliente(id: number): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}/reactivar`, null);
+  }
+
 }

@@ -1,5 +1,5 @@
 <div class="tienda-container">
-  <div class="producto-card" *ngFor="let producto of productos">
+  <div class="producto-card" *ngFor="let producto of productosFiltrados">
     <p-card>
       <ng-template pTemplate="header">
         <img [src]="getImagenUrl(producto)" alt="{{ producto.nombre }}" class="producto-imagen" loading="lazy" />
@@ -9,47 +9,61 @@
         <p>{{ producto.descripcion }}</p>
         <p>Precio: ${{ producto.precio }}</p>
         <p>Stock: {{ producto.stock }}</p>
-        <button pButton type="button" label="Agregar al Carrito" (click)="agregarAlCarrito(producto)" class="p-button-success"></button>
-        <button pButton type="button" label="Detalles" (click)="navigateToDetails(producto.id)" class="p-button-info"></button>
-      </ng-template>
-      <ng-template pTemplate="footer">
-        <button pButton type="button" label="Cambiar Imagen" icon="pi pi-upload" (click)="openChangeImageDialog(producto)" class="p-button-secondary"></button>
+        <div class="botones-contenedor">
+          <button
+            pButton
+            type="button"
+            label="Agregar al Carrito"
+            (click)="agregarAlCarrito(producto)"
+            class="p-button-success">
+          </button>
+          <button
+            pButton
+            type="button"
+            label="Detalles"
+            (click)="abrirDialogoDetalles(producto)"
+            class="p-button-info">
+          </button>
+        </div>
+
       </ng-template>
     </p-card>
   </div>
 </div>
 
-<!-- Diálogo para cambiar la imagen -->
-<p-dialog header="Cambiar Imagen" [(visible)]="displayDialog" [modal]="true" [closable]="false" [style]="{width: '400px'}">
-  <div class="p-fluid">
+<!-- Diálogo para mostrar detalles -->
+<p-dialog header="Detalles del Producto"
+          [(visible)]="mostrarDialogoDetalles"
+          [modal]="true"
+          [closable]="true"
+          [style]="{width: '800px', borderRadius: '10px'}"
+          [contentStyle]="{padding: '20px'}"
+          [styleClass]="'dark-dialog'">
+  <div class="p-fluid detalles-producto-dialog">
+    <div class="p-field imagen-contenedor">
+      <img [src]="getImagenUrl(productoSeleccionado)" alt="Imagen del Producto" class="vista-previa-imagen" />
+    </div>
     <div class="p-field">
-      <label for="file">Seleccionar Nueva Imagen</label>
-      <input type="file" accept="image/*" (change)="onFileSelected($event)" id="file" />
+      <label class="dialog-label">Nombre:</label>
+      <span class="dialog-value">{{ productoSeleccionado?.nombre }}</span>
+    </div>
+    <div class="p-field">
+      <label class="dialog-label">Descripción:</label>
+      <span class="dialog-value">{{ productoSeleccionado?.descripcion }}</span>
+    </div>
+    <div class="p-field">
+      <label class="dialog-label">Precio:</label>
+      <span class="dialog-value">${{ productoSeleccionado?.precio }}</span>
+    </div>
+    <div class="p-field">
+      <label class="dialog-label">Stock:</label>
+      <span class="dialog-value">{{ productoSeleccionado?.stock }}</span>
     </div>
 
-    <!-- Previsualización de la imagen seleccionada -->
-    <div class="p-field" *ngIf="previewImage">
-      <label>Vista Previa:</label>
-      <img [src]="previewImage" alt="Vista Previa" class="vista-previa-imagen" />
-    </div>
-
-    <!-- Barra de progreso de subida -->
-    <div class="p-field" *ngIf="uploadProgress > 0 && uploadProgress < 100">
-      <label>Subiendo Imagen:</label>
-      <p-progressBar [value]="uploadProgress"></p-progressBar>
-    </div>
-
-    <!-- Mensaje de error -->
-    <div class="p-field" *ngIf="uploadError">
-      <p class="p-error">{{ uploadError }}</p>
-    </div>
   </div>
 
-  <ng-template pTemplate="footer">
-    <button pButton type="button" label="Cancelar" icon="pi pi-times" (click)="closeDialog()" class="p-button-text"></button>
-    <button pButton type="button" label="Subir" icon="pi pi-check" (click)="uploadImagen()" [disabled]="!newImageFile" class="p-button-success"></button>
-  </ng-template>
 </p-dialog>
 
-<!-- Mensajes de PrimeNG -->
+
+
 <p-toast></p-toast>

@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import {Router} from '@angular/router';
+import {environment} from '../../env/environment';
 
 interface DecodedToken {
   sub: string;
@@ -17,7 +18,9 @@ interface DecodedToken {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5132/api/Auth';
+  // private apiUrl = 'http://localhost:5132/api/Auth';
+  private apiUrl = `${environment.apiUrl}Auth`;
+
   private isBrowser: boolean;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient,  private router: Router) {
@@ -92,6 +95,32 @@ export class AuthService {
         id: parseInt(decoded.sub, 10),
         nombre: decoded.nombre,
         email: decoded.email
+      };
+    } catch (error) {
+      console.error('Error al decodificar el token:', error);
+      return null;
+    }
+  }
+  isAdmin(): boolean {
+    const role = this.getUserRole();
+    return role === 'Admin';
+  }
+  getAdminData(): { id: number; nombre: string; email: string } | null {
+    if (!this.isAdmin()) {
+      console.warn('El usuario no tiene permisos de administrador.');
+      return null;
+    }
+
+    const token = this.getToken();
+    if (!token) {
+      return null;
+    }
+    try {
+      const decoded: DecodedToken = jwtDecode(token);
+      return {
+        id: parseInt(decoded.sub, 10),
+        nombre: decoded.nombre,
+        email: decoded.email,
       };
     } catch (error) {
       console.error('Error al decodificar el token:', error);

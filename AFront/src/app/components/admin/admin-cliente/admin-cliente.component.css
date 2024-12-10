@@ -1,0 +1,13 @@
+.acciones-dialogo {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+p-dialog .ui-dialog-content {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.MasDetalle{
+  margin-right: 20px;
+}

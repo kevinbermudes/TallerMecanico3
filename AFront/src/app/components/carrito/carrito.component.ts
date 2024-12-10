@@ -7,6 +7,9 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import {Servicio} from '../../Entity/Servicio';
+import {Router} from '@angular/router';
+import {SharedMessageService} from '../../Service/shared-message.service';
 
 @Component({
   selector: 'app-carrito',
@@ -30,12 +33,15 @@ export class CarritoComponent implements OnInit {
   totalPrecio: number = 0;
 
   constructor(
+    private sharedMessageService: SharedMessageService,
+    private router: Router,
     private carritoService: CarritoService,
     private authService: AuthService,
     private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
+
     const clienteData = this.authService.getClienteData();
     if (clienteData) {
       this.clienteId = clienteData.id;
@@ -47,18 +53,26 @@ export class CarritoComponent implements OnInit {
         detail: 'No se pudo cargar el carrito. Intenta iniciar sesión nuevamente.'
       });
     }
+    this.sharedMessageService.message$.subscribe((message) => {
+      if (message) {
+        this.messageService.add(message);
+      }
+    });
+
+
   }
 
   cargarCarrito(): void {
     if (this.clienteId) {
       this.carritoService.getCarritosByClienteId(this.clienteId).subscribe(
         (response) => {
-          // Manejar el caso donde la respuesta tenga la propiedad $values
           const carritoArray = Array.isArray(response) ? response : response.$values || [];
 
-          // Filtrar productos donde estaBorrado es false
-          this.carritoProductos = carritoArray.filter((item) => item.estaBorrado === false);
-          this.calcularResumen(); // Calcular el resumen después de cargar el carrito
+          // Filtrar ítems no eliminados
+          this.carritoProductos = carritoArray.filter((item) => !item.estaBorrado);
+
+          // Calcular el resumen del carrito
+          this.calcularResumen();
         },
         (error) => {
           console.error('Error al cargar el carrito:', error);
@@ -71,6 +85,7 @@ export class CarritoComponent implements OnInit {
       );
     }
   }
+
 
 
   eliminarProducto(carritoId: number): void {
@@ -96,17 +111,17 @@ export class CarritoComponent implements OnInit {
 
 
   calcularResumen(): void {
-    this.totalItems = this.carritoProductos.reduce((sum, item) => sum + item.cantidad, 0);
+    this.totalItems = this.carritoProductos.length;
     this.totalPrecio = this.carritoProductos.reduce((sum, item) => sum + item.precioTotal, 0);
   }
 
-
   pagarCarrito(): void {
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Pago realizado',
-      detail: 'El pago del carrito se ha completado.'
-    });
-    // Aquí puedes añadir la lógica de pago real, como redirigir a una pasarela de pago.
+    this.sharedMessageService.setTotalAmount(this.totalPrecio);
+    this.router.navigate(['/cliente/payment']);
+  }
+
+
+  getImagenUrl(servicio: Servicio): string {
+    return servicio.imagen || 'https://via.placeholder.com/150';
   }
 }

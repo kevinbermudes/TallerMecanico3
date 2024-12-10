@@ -46,3 +46,117 @@
   line-height: 1;
 }
 
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0;
+  right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 30px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 4px; top: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+.toggle-switch input:checked + .slider {
+  background-color: #2a2a2a;
+}
+
+.toggle-switch input:checked + .slider:before {
+  transform: translateX(30px);
+}
+
+.toggle-switch i {
+  position: absolute;
+  top: 5px;
+  left: 8px;
+  color: #666;
+}
+
+.toggle-switch input:checked ~ i {
+  left: 28px;
+  color: #FFD700; /* un color distintivo para el sol */
+}
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.switch-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  background-color: #a1a0a0;
+  border-radius: 4px;
+}
+
+.switch {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #fff;
+}
+
+.switch i {
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.switch-on {
+  /* Si quieres algún estilo adicional cuando esté en modo oscuro */
+}
+
+
+
+.toolbar-right .p-button {
+  background-color: #aa0000; /* Un rojo oscuro para el botón */
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.toolbar-right .p-button .p-button-icon {
+  margin-right: 0.5rem; /* Espacio entre el icono y el texto */
+}
+
+.toolbar-right .p-button:hover {
+  background-color: #cc0000; /* Un tono más claro en hover para dar feedback visual */
+}
+
+/* Opcional: Si estás en modo oscuro y quieres ajustar aún más el contraste */
+.dark-mode .toolbar-right .p-button {
+  background-color: #b30000;
+}
+
+.dark-mode .toolbar-right .p-button:hover {
+  background-color: #d10000;
+}

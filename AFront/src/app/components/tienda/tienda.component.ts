@@ -36,14 +36,11 @@ import {AuthService} from '../../Service/auth.service';
 })
 export class TiendaComponent implements OnInit {
   productos: Producto[] = [];
+  productosFiltrados: Producto[] = [];
 
-  // Variables para el diálogo
-  displayDialog: boolean = false;
-  selectedProduct: Producto | null = null;
-  newImageFile: File | null = null;
-  previewImage: string | ArrayBuffer | null | undefined = null;
-  uploadProgress: number = 0;
-  uploadError: string = '';
+  // Variables para el diálogo de detalles
+  mostrarDialogoDetalles: boolean = false;
+  productoSeleccionado: Producto | null = null;
 
   constructor(
     private carritoService: CarritoService,
@@ -54,17 +51,19 @@ export class TiendaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.productoService.getProductos().subscribe((data) => {
-      this.productos = data;
+    this.productoService.getProductos().subscribe({
+      next: (productos) => {
+        this.productos = productos;
+        this.productosFiltrados = productos.filter((producto) => !producto.estaBorrado);
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudieron cargar los productos.',
+        });
+      },
     });
-  }
-
-  getCarritos(carritos: { $values: Carrito[] } | Carrito[]): Carrito[] {
-    return Array.isArray(carritos) ? carritos : carritos.$values;
-  }
-
-  navigateToDetails(productId: number): void {
-    this.router.navigate(['/producto', productId]);
   }
 
   agregarAlCarrito(producto: Producto): void {
@@ -91,82 +90,17 @@ export class TiendaComponent implements OnInit {
     );
   }
 
-
-  // Método para abrir el diálogo de cambio de imagen
-  openChangeImageDialog(producto: Producto): void {
-    this.selectedProduct = producto;
-    this.displayDialog = true;
-    this.newImageFile = null;
-    this.previewImage = null;
-    this.uploadProgress = 0;
-    this.uploadError = '';
+  abrirDialogoDetalles(producto: Producto): void {
+    this.productoSeleccionado = producto;
+    this.mostrarDialogoDetalles = true;
   }
 
-  // Método para manejar la selección de archivo dentro del diálogo
-  onFileSelected(event: any): void {
-    if (event.target.files && event.target.files.length > 0) {
-      const file = event.target.files[0];
-      const tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif'];
-      const maxSize = 5 * 1024 * 1024; // 5 MB
-
-      if (!tiposPermitidos.includes(file.type)) {
-        this.messageService.add({severity:'error', summary: 'Error', detail: 'Tipo de archivo no permitido. Solo se permiten imágenes (jpg, jpeg, png, gif).' });
-        return;
-      }
-
-      if (file.size > maxSize) {
-        this.messageService.add({severity:'error', summary: 'Error', detail: 'El archivo es demasiado grande. El tamaño máximo permitido es 5 MB.' });
-        return;
-      }
-
-      this.newImageFile = file;
-
-      // Generar una vista previa de la imagen
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.previewImage = e.target?.result;
-      };
-      reader.readAsDataURL(file);
-    }
+  cerrarDialogoDetalles(): void {
+    this.mostrarDialogoDetalles = false;
+    this.productoSeleccionado = null;
   }
 
-  // Método para subir la nueva imagen
-  uploadImagen(): void {
-    if (!this.selectedProduct || !this.newImageFile) {
-      this.uploadError = 'Producto o archivo no seleccionado.';
-      return;
-    }
-
-    this.uploadProgress = 0;
-    this.uploadError = '';
-
-    this.productoService.uploadImagen(this.selectedProduct.id, this.newImageFile).subscribe({
-      next: (response) => {
-        if (response.Url) {
-          const productoIndex = this.productos.findIndex(p => p.id === this.selectedProduct?.id);
-          if (productoIndex !== -1) {
-            this.productos[productoIndex].imagen = response.Url;
-          }
-          this.messageService.add({severity:'success', summary: 'Éxito', detail: 'Imagen subida exitosamente.' });
-          this.displayDialog = false;
-        }
-      },
-      error: (error) => {
-        console.error('Error al subir la imagen:', error);
-        this.uploadError = 'Error al subir la imagen. Intenta nuevamente.';
-        this.messageService.add({severity:'error', summary: 'Error', detail: 'Error al subir la imagen. Intenta nuevamente.' });
-      }
-    });
+  getImagenUrl(producto: Producto | null): string {
+    return producto?.imagen || 'https://via.placeholder.com/150';
   }
-
-  // Método para cerrar el diálogo
-  closeDialog(): void {
-    this.displayDialog = false;
-  }
-
-  // Método para obtener la URL de la imagen
-  getImagenUrl(producto: Producto): string {
-    return producto.imagen || 'https://via.placeholder.com/150';
-  }
-
 }

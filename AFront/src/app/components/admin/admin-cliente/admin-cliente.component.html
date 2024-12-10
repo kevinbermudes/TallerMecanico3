@@ -1,0 +1,97 @@
+<h2>Gestión de Clientes</h2>
+
+<div style="display: flex; align-items: center; margin-bottom: 10px;">
+  <input
+    pInputText
+    type="text"
+    [(ngModel)]="searchValue"
+    (input)="dt.filterGlobal(searchValue, 'contains')"
+    placeholder="Buscar por nombre..."
+    style="flex: 1; margin-right: 10px;"
+  />
+  <button
+    pButton
+    type="button"
+    label="Limpiar"
+    icon="pi pi-filter-slash"
+    class="p-button-outlined"
+    (click)="clear(dt)"
+  ></button>
+</div>
+
+<p-table
+  #dt
+  [value]="clientes"
+  [responsiveLayout]="'scroll'"
+  [scrollable]="true"
+  [globalFilterFields]="['primerNombre', 'primerApellido']"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Nombre</th>
+      <th>Email</th>
+      <th>Teléfono</th>
+      <th>Acciones</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-cliente>
+    <tr>
+      <td>{{ cliente.primerNombre }} {{ cliente.primerApellido }}</td>
+      <td>{{ cliente.emailSecundario || cliente.usuario?.email }}</td>
+      <td>{{ cliente.telefono }}</td>
+      <td>
+        <!-- Acciones -->
+        <ng-container *ngIf="cliente.estaBorrado; else accionesNormales">
+          <button
+            pButton
+            icon="pi pi-refresh"
+            label="Reactivar"
+            class="p-button-success"
+            (click)="reactivarCliente(cliente.id)"
+          ></button>
+        </ng-container>
+        <ng-template #accionesNormales>
+          <button
+            pButton
+            icon="pi pi-info-circle"
+            label="Más Detalles"
+            class="p-button-info MasDetalle"
+            (click)="verDetallesCliente(cliente)"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-trash"
+            class="p-button-danger"
+            label="Eliminar"
+            (click)="eliminarCliente(cliente.id)"
+          ></button>
+        </ng-template>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+
+<p-dialog
+  [(visible)]="mostrarDetalles"
+  header="Detalles del Cliente"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '50vw' }"
+>
+  <div *ngIf="clienteSeleccionado">
+    <p><strong>Nombre:</strong> {{ clienteSeleccionado.primerNombre }} {{ clienteSeleccionado.primerApellido }}</p>
+    <p><strong>Email:</strong> {{ clienteSeleccionado.emailSecundario || clienteSeleccionado.usuario?.email }}</p>
+    <p><strong>Teléfono:</strong> {{ clienteSeleccionado.telefono }}</p>
+    <p><strong>Dirección:</strong> {{ clienteSeleccionado.direccion }}</p>
+    <p><strong>Fecha de Nacimiento:</strong> {{ clienteSeleccionado.fechaNacimiento | date }}</p>
+    <p><strong>Género:</strong> {{ getGeneroLabel(clienteSeleccionado?.genero) }}</p>
+    <p><strong>Estado Civil:</strong> {{ getEstadoCivilLabel(clienteSeleccionado?.estadoCivil) }}</p>
+    <p><strong>Vehículos:</strong> {{ clienteSeleccionado.vehiculos?.length || 0 }}</p>
+    <p><strong>Facturas:</strong> {{ clienteSeleccionado.facturas?.length || 0 }}</p>
+  </div>
+  <div class="acciones-dialogo">
+    <button pButton label="Cerrar" (click)="mostrarDetalles = false" class="p-button-secondary"></button>
+  </div>
+</p-dialog>
+<p-toast></p-toast>

@@ -1,0 +1,139 @@
+<h2>Gestión de Productos</h2>
+
+<!-- Botón para abrir el diálogo de creación -->
+<div style="margin-bottom: 20px; text-align: right;">
+  <button
+    pButton
+    type="button"
+    label="Crear Producto"
+    icon="pi pi-plus"
+    class="p-button-success"
+    (click)="abrirDialogoCrear()">
+  </button>
+</div>
+
+<!-- Tabla de productos -->
+<p-table
+  #dt
+  [value]="productos"
+  [responsiveLayout]="'scroll'"
+  [paginator]="true"
+  [rows]="10"
+  [rowsPerPageOptions]="[5, 10, 20]"
+  [globalFilterFields]="['nombre', 'descripcion']"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos">
+  <ng-template pTemplate="header">
+    <tr>
+      <th pSortableColumn="nombre">Nombre <p-sortIcon field="nombre"></p-sortIcon></th>
+      <th pSortableColumn="descripcion">Descripción <p-sortIcon field="descripcion"></p-sortIcon></th>
+      <th pSortableColumn="precio">Precio <p-sortIcon field="precio"></p-sortIcon></th>
+      <th pSortableColumn="stock">Stock <p-sortIcon field="stock"></p-sortIcon></th>
+      <th>Acciones</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-producto>
+    <tr>
+      <td>{{ producto.nombre }}</td>
+      <td>{{ producto.descripcion }}</td>
+      <td>{{ producto.precio | currency: 'USD' }}</td>
+      <td>{{ producto.stock }}</td>
+      <td>
+        <ng-container *ngIf="producto.estaBorrado; else accionesNormales">
+          <button
+            pButton
+            type="button"
+            icon="pi pi-refresh"
+            label="Reactivar"
+            class="p-button-success"
+            (click)="reactivarProducto(producto.id)">
+          </button>
+        </ng-container>
+        <ng-template #accionesNormales>
+          <div style="display: flex; gap: 10px;">
+            <button
+              pButton
+              type="button"
+              icon="pi pi-pencil"
+              label="Editar"
+              class="p-button-warning"
+              (click)="abrirDialogoEditar(producto)">
+            </button>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-trash"
+              label="Eliminar"
+              class="p-button-danger"
+              (click)="eliminarProducto(producto.id)">
+            </button>
+          </div>
+        </ng-template>
+
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<!-- Diálogo para Crear/Editar Producto -->
+<p-dialog
+  [(visible)]="mostrarDialogo"
+  header="{{ creando ? 'Crear Producto' : 'Editar Producto' }}"
+  [modal]="true"
+  [closable]="false"
+  [style]="{ width: '50vw', borderRadius: '12px', boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.2)' }"
+  [contentStyle]="{ padding: '20px', backgroundColor: '#f9f9f9' }">
+  <form class="p-fluid">
+    <!-- Imagen del producto -->
+    <div class="p-field" style="text-align: center;">
+      <label>Imagen del Producto:</label>
+      <img
+        [src]="imagenPrevisualizacion || getImagenUrl(nuevoProducto)"
+        alt="Imagen del Producto"
+        style="width: 150px; height: 150px; object-fit: cover; margin: 10px auto; display: block; border-radius: 8px; border: 1px solid #ccc;" />
+      <input id="imagen" type="file" (change)="onImagenSeleccionada($event)" style="margin: 0 auto; display: block;" />
+    </div>
+
+    <!-- Campos de texto -->
+    <div class="p-field">
+      <label for="nombre">Nombre:</label>
+      <input id="nombre" pInputText type="text" [(ngModel)]="nuevoProducto.nombre" name="nombre" placeholder="Nombre del Producto" />
+    </div>
+    <div class="p-field">
+      <label for="descripcion">Descripción:</label>
+      <textarea id="descripcion" pInputTextarea [(ngModel)]="nuevoProducto.descripcion" name="descripcion" placeholder="Descripción del Producto"></textarea>
+    </div>
+    <div class="p-field">
+      <label for="precio">Precio:</label>
+      <input id="precio" pInputText type="number" [(ngModel)]="nuevoProducto.precio" name="precio" placeholder="Precio del Producto" />
+    </div>
+    <div class="p-field">
+      <label for="stock">Stock:</label>
+      <input id="stock" pInputText type="number" [(ngModel)]="nuevoProducto.stock" name="stock" placeholder="Cantidad en Stock" />
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+      <button
+        pButton
+        type="button"
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-secondary"
+        (click)="cerrarDialogoCrearEditar()">
+      </button>
+      <button
+        pButton
+        type="button"
+        label="Guardar"
+        icon="pi pi-check"
+        class="p-button-success"
+        (click)="guardarProducto()">
+      </button>
+    </div>
+  </ng-template>
+
+</p-dialog>
+
+
+<p-toast></p-toast>
